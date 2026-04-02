@@ -255,8 +255,8 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 </head>
 <body>
 
-<!-- ══════ WELCOME ══════ -->
-<div id="sw" class="scr on">
+<!-- ══════ WELCOME (admin only — hidden from children) ══════ -->
+<div id="sw" class="scr">
  <div class="w-inner">
   <div class="w-hero">
     <div class="w-instrument-tag">NEXTHIE · Rastreio Digital</div>
@@ -355,38 +355,60 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
   </div>
 </div>
 
-<!-- ══════ INSTRUCTIONS ══════ -->
-<div id="si" class="scr">
-  <div class="hdr">
-    <button class="bk" onclick="go('ss')">←</button>
-    <div><h2>Instruções</h2><p>Identificação de Letras</p></div>
-  </div>
-  <div class="i-wrap">
-    <div class="i-card">
-      <div class="i-head">
-        <h2>Conhecimento de Letras</h2>
-        <p>23 itens · identificação pelo nome · ~3–5 minutos</p>
-      </div>
-      <div class="i-body">
-        <div class="i-script">
-          «Neste jogo, vais ouvir e tocar naquilo que te for pedido. Primeiro vamos praticar com um exemplo.»
-        </div>
-        <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px;font-weight:600">Notas para o técnico:</div>
-        <ul class="i-notes">
-          <li>O áudio é reproduzido automaticamente ao aparecer cada item</li>
-          <li>A criança pode tocar no botão 🔊 para ouvir novamente</li>
-          <li>Sem limite de tempo por item</li>
-          <li>Sem feedback de acerto/erro — a criança não sabe se acertou</li>
-          <li>Após tocar numa opção, avança automaticamente (950ms)</li>
-        </ul>
-      </div>
-      <div class="i-foot">
-        <button class="btn btn-ghost btn-sm" onclick="go('ss')">← Voltar</button>
-        <button class="btn btn-coral" onclick="beginExample()">Começar jogo →</button>
-      </div>
+<!-- ══════ INSTRUCTIONS (child-friendly) ══════ -->
+<div id="si" class="scr" style="background:linear-gradient(180deg,#1a1028 0%,#2a1a3a 50%,#1a2a3a 100%);align-items:center;justify-content:center;overflow:hidden;position:relative">
+  <!-- Floating letters background -->
+  <div id="floating-letters" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;opacity:.08"></div>
+
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px;max-width:420px;width:100%">
+    <!-- Mascot -->
+    <div id="instr-mascot" style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#E85D75,#C0344F);display:flex;align-items:center;justify-content:center;font-size:3rem;box-shadow:0 8px 32px rgba(232,93,117,.35);margin-bottom:20px;animation:bounce 3s ease-in-out infinite">
+      🔤
+    </div>
+
+    <!-- Speech bubble -->
+    <div id="instr-bubble" style="background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:18px 24px;margin-bottom:24px;font-size:1.1rem;font-weight:700;color:#fff;line-height:1.5;opacity:0;transform:translateY(10px);transition:all .5s ease">
+      Vamos jogar com letras!
+    </div>
+
+    <!-- Big play button -->
+    <button id="instr-play-btn" onclick="beginExample()" style="width:clamp(100px,25vw,130px);height:clamp(100px,25vw,130px);border-radius:50%;border:none;background:linear-gradient(135deg,#E85D75,#C0344F);color:#fff;font-size:2.5rem;cursor:pointer;box-shadow:0 0 0 0 rgba(232,93,117,.3);animation:tap-pulse 2s ease-in-out infinite;display:flex;align-items:center;justify-content:center;transition:transform .15s">
+      ▶
+    </button>
+    <div style="font-size:.85rem;font-weight:700;color:rgba(255,255,255,.5);margin-top:12px">Toca para jogar!</div>
+
+    <!-- Technician notes (hidden, toggle with tiny link) -->
+    <div id="tech-notes-toggle" style="margin-top:32px;font-size:.6rem;color:rgba(255,255,255,.1);cursor:pointer" onclick="document.getElementById('tech-notes').style.display=document.getElementById('tech-notes').style.display==='none'?'block':'none'">notas técnicas</div>
+    <div id="tech-notes" style="display:none;margin-top:8px;text-align:left;background:rgba(0,0,0,.3);border-radius:10px;padding:12px 16px;font-size:.72rem;color:rgba(255,255,255,.35);line-height:1.7">
+      Áudio auto-play · 🔊 para repetir · Sem limite de tempo · Sem feedback acerto/erro · Avança após toque (750ms) · 23 itens PIPALE 3B ordem fixa
     </div>
   </div>
 </div>
+
+<script>
+// Floating letters animation for instructions background
+(function() {
+  const container = document.getElementById('floating-letters');
+  if (!container) return;
+  const letters = 'ABCDEFGHIJLMNOPQRSTUVXZ';
+  for (let i = 0; i < 20; i++) {
+    const el = document.createElement('div');
+    const size = 20 + Math.random() * 40;
+    el.textContent = letters[Math.floor(Math.random() * letters.length)];
+    el.style.cssText = `position:absolute;font-size:${size}px;font-weight:900;color:#fff;left:${Math.random()*100}%;top:${Math.random()*100}%;animation:float-letter ${8+Math.random()*12}s linear infinite;animation-delay:${Math.random()*-10}s;`;
+    container.appendChild(el);
+  }
+})();
+</script>
+<style>
+@keyframes float-letter {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+}
+#instr-play-btn:active { transform: scale(.9); }
+</style>
 
 <!-- ══════ EXAMPLE TRIAL ══════ -->
 <div id="sex" class="scr">
@@ -668,12 +690,57 @@ function startSession() {
   S.ci = 0;
   S.blocked = false;
   calcAge();
+  showInstructions();
+}
+
+/* ══════════════════════════════════════════════════════
+   INSTRUCTIONS — child-facing intro with audio
+══════════════════════════════════════════════════════ */
+function showInstructions() {
   go('si');
+  const bubble = document.getElementById('instr-bubble');
+
+  // Animate bubble in
+  setTimeout(() => {
+    bubble.style.opacity = '1';
+    bubble.style.transform = 'translateY(0)';
+  }, 300);
+
+  // Auto-play welcome audio
+  setTimeout(() => {
+    speechSynthesis.cancel();
+    const voice = getPtVoice ? getPtVoice() : null;
+
+    const utt = new SpeechSynthesisUtterance('Vamos jogar com letras! Vais ouvir o nome de uma letra e depois tocas na letra certa. Primeiro vamos treinar!');
+    utt.lang = 'pt-PT'; utt.rate = 0.85; utt.pitch = 1.1;
+    if (voice) utt.voice = voice;
+
+    const mascot = document.getElementById('instr-mascot');
+    mascot.style.animation = 'speak-bounce .4s ease-in-out infinite alternate';
+
+    utt.onend = () => {
+      mascot.style.animation = 'bounce 3s ease-in-out infinite';
+      bubble.textContent = 'Toca no botão para começar! 👇';
+    };
+    utt.onerror = () => {
+      mascot.style.animation = 'bounce 3s ease-in-out infinite';
+    };
+
+    speechSynthesis.speak(utt);
+  }, 600);
+}
+
+// Helper: get Portuguese voice (reuse from index if available)
+function getPtVoice() {
+  const voices = speechSynthesis.getVoices();
+  const ptPT = voices.filter(v => v.lang === 'pt-PT');
+  const ptAny = voices.filter(v => v.lang.startsWith('pt'));
+  const female = ptPT.find(v => /femin|female|joana|ines|raquel|catarina|maria/i.test(v.name));
+  return female || ptPT[0] || ptAny[0] || null;
 }
 
 /* ══════════════════════════════════════════════════════
    EXAMPLE TRIAL — shapes (⭐ △ ☁)
-   Matches PIPALE 3B caderno: "rodeia a estrela"
 ══════════════════════════════════════════════════════ */
 const SHAPES = [
   { symbol: '⭐', label: 'estrela', is_target: true },
@@ -697,7 +764,7 @@ function beginExample() {
     area.appendChild(card);
   });
 
-  // Auto-play "rodeia a estrela"
+  // Auto-play "toca na estrela"
   setTimeout(() => playExAudio(), 500);
 }
 
@@ -705,7 +772,7 @@ function playExAudio() {
   const btn = document.getElementById('ex-audio-btn');
   btn.classList.add('playing');
   speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance('Rodeia a estrela');
+  const utt = new SpeechSynthesisUtterance('Toca na estrela');
   utt.lang = 'pt-PT';
   utt.rate = 0.85;
   const voices = speechSynthesis.getVoices();
@@ -729,8 +796,8 @@ function pickExample(shape, card) {
       document.getElementById('ex-fb-text').innerHTML = 'Já percebeste como se joga.<br>Agora vais ouvir nomes de letras e tocar na letra certa.';
     } else {
       document.getElementById('ex-fb-icon').textContent = '⭐';
-      document.getElementById('ex-fb-title').textContent = 'A resposta certa era a estrela.';
-      document.getElementById('ex-fb-text').innerHTML = 'Não faz mal! Agora vais ouvir nomes de letras e tocar na letra certa.';
+      document.getElementById('ex-fb-title').textContent = 'Era a estrela! Não faz mal.';
+      document.getElementById('ex-fb-text').innerHTML = 'Agora vais ouvir nomes de letras.<br>Toca na letra certa!';
     }
     fb.style.display = 'flex';
   }, 600);
@@ -1205,9 +1272,13 @@ function testSheets() {
 }
 
 /* ══════════════════════════════════════════════════════
-   INIT
+   INIT — child mode is the DEFAULT
+   Admin/setup only accessible with ?admin=1
 ══════════════════════════════════════════════════════ */
-// Populate letter strip (PIPALE order)
+const params = new URLSearchParams(window.location.search);
+const isAdmin = params.get('admin') === '1';
+
+// Populate letter strip (admin welcome screen)
 const strip = document.getElementById('letter-strip');
 ITEMS_3B.forEach(item => {
   const el = document.createElement('div');
@@ -1215,62 +1286,51 @@ ITEMS_3B.forEach(item => {
   el.textContent = item.target;
   strip.appendChild(el);
 });
-
-// Set today's date
 document.getElementById('fdt').value = new Date().toISOString().slice(0, 10);
-
-// Load saved children and Sheets status
 renderChildPicker();
 updateSheetsStatus();
 
-// Save child on session start (hook into startSession)
+// Hook: save child on admin session start
 const _origStartSession = startSession;
 startSession = function() {
   _origStartSession();
-  if (S.id) {
-    saveChild({ id: S.id, dob: S.dob, sex: S.sex, sch: S.sch, plnm: S.plnm });
-  }
+  if (S.id) saveChild({ id: S.id, dob: S.dob, sex: S.sex, sch: S.sch, plnm: S.plnm });
 };
 
-// ── AUTO-PLAY MODE ──
-// If URL has ?play=1 and there's an active child in localStorage,
-// skip setup and go straight to instructions (child-facing flow per F21)
-(function() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('play') !== '1') return;
+if (isAdmin) {
+  // ── ADMIN MODE: show welcome/setup (for technicians) ──
+  go('sw');
+} else {
+  // ── CHILD MODE (default): straight to game ──
+  const dt = new Date().toISOString().slice(0, 10);
 
+  // Load active child from localStorage (pilot) or platform (production)
   try {
     const child = JSON.parse(localStorage.getItem('nexthie_active_child'));
-    if (!child || !child.id || !child.dob) return;
+    if (child && child.id) {
+      const d1 = new Date(child.dob), d2 = new Date(dt);
+      S.id = child.id;
+      S.dob = child.dob || '';
+      S.sex = child.sex || '';
+      S.sch = child.sch || '';
+      S.ex = child.tech || '';
+      S.plnm = child.plnm || false;
+      S.am = child.dob ? (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth()) : 0;
+    }
+  } catch (e) {}
 
-    // Set up session from stored child data
-    const dt = new Date().toISOString().slice(0, 10);
-    const d1 = new Date(child.dob), d2 = new Date(dt);
-    const am = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+  S.dt = dt;
+  S.letterCase = 'upper';
+  S.sessionId = 'LID-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 5).toUpperCase();
+  S.items = buildItems(S.letterCase);
+  S.resp = {};
+  S.el = 0;
+  S.ci = 0;
+  S.blocked = false;
+  S.playMode = true;
 
-    S.id = child.id;
-    S.dob = child.dob;
-    S.sex = child.sex || '';
-    S.sch = child.sch || '';
-    S.ex = child.tech || '';
-    S.dt = dt;
-    S.plnm = child.plnm || false;
-    S.am = am;
-    S.letterCase = 'upper';
-    S.sessionId = 'LID-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 5).toUpperCase();
-    S.items = buildItems(S.letterCase);
-    S.resp = {};
-    S.el = 0;
-    S.ci = 0;
-    S.blocked = false;
-
-    // Skip welcome + setup → go straight to instructions
-    go('si');
-  } catch (e) {
-    // If anything fails, fall back to normal setup
-    console.log('Auto-play failed, showing setup:', e);
-  }
-})();
+  showInstructions();
+}
 </script>
 </body>
 </html>
