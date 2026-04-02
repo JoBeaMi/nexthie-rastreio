@@ -9,216 +9,224 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden}
-body{background:#E8FFF8}
+body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
 
 .world{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 
-/* Top: mascot + bubble */
-.top{flex-shrink:0;padding:16px 20px 8px;display:flex;align-items:center;gap:12px;position:relative;z-index:2;background:linear-gradient(180deg,#D0F5EC 0%,transparent 100%)}
-.top svg{flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,160,144,.2))}
-.top-bubble{background:#fff;border-radius:18px;padding:12px 18px;box-shadow:0 3px 12px rgba(0,0,0,.05);font-size:.9rem;font-weight:800;color:#0a4a40;line-height:1.4;position:relative;opacity:0;transform:scale(.95);transition:all .4s cubic-bezier(.34,1.56,.64,1)}
-.top-bubble.on{opacity:1;transform:scale(1)}
-.top-bubble::before{content:'';position:absolute;left:-8px;top:50%;margin-top:-6px;border:6px solid transparent;border-right-color:#fff}
+/* Speech bubble at top */
+.top-speech{
+  flex-shrink:0;text-align:center;padding:14px 20px 6px;position:relative;z-index:3;
+}
+.speech{
+  display:inline-block;background:#fff;border-radius:22px;padding:12px 24px;
+  box-shadow:0 4px 16px rgba(0,0,0,.06);font-size:1rem;font-weight:800;color:#0a4a40;
+  line-height:1.4;opacity:0;transform:translateY(-8px) scale(.95);
+  transition:all .4s cubic-bezier(.34,1.56,.64,1);position:relative;
+}
+.speech.on{opacity:1;transform:translateY(0) scale(1)}
+.speech::after{content:'';position:absolute;bottom:-8px;left:50%;margin-left:-8px;border:8px solid transparent;border-top-color:#fff}
 
-/* Scroll area */
-.scroll-area{flex:1;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;position:relative}
-.scroll-area::-webkit-scrollbar{display:none}
+/* Scroll */
+.scroll{flex:1;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{display:none}
 
 /* Landscape */
-.landscape{height:100%;min-width:max-content;display:flex;align-items:flex-end;padding:0 60px 0 40px;position:relative}
+.land{height:100%;min-width:max-content;position:relative;padding:0 80px}
 
-/* Sky decorations */
-.cloud{position:absolute;border-radius:50%;background:rgba(255,255,255,.5)}
+/* Sky */
+.cloud{position:absolute;background:rgba(255,255,255,.45);border-radius:50px}
 
 /* Ground */
-.ground{position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(180deg,#5DCAA5 0%,#3aab6d 40%,#2d8a56 100%);border-radius:60% 60% 0 0 / 20% 20% 0 0}
-.ground::before{content:'';position:absolute;top:-15px;left:0;right:0;height:30px;background:linear-gradient(180deg,transparent,rgba(93,202,165,.5));border-radius:50%}
+.ground{
+  position:absolute;bottom:0;left:0;right:0;height:40%;
+  background:linear-gradient(180deg,#5DCAA5 0%,#3aab6d 50%,#2d8a56 100%);
+  border-radius:80% 80% 0 0 / 15% 15% 0 0;
+}
+/* Grass tufts */
+.grass{position:absolute;bottom:38%;width:100%;height:20px;z-index:1;overflow:hidden}
+.tuft{position:absolute;bottom:0;width:24px;height:14px;background:#5DCAA5;border-radius:50% 50% 0 0}
 
-/* Path line */
-.path-line{position:absolute;bottom:32%;left:30px;right:30px;height:6px;border-radius:3px;background:rgba(255,255,255,.3);z-index:1}
-.path-line-fill{height:100%;border-radius:3px;background:rgba(255,255,255,.6);width:14%;transition:width 1s ease}
+/* Path */
+.path-track{position:absolute;bottom:26%;left:60px;right:60px;height:10px;border-radius:5px;background:rgba(255,255,255,.2);z-index:1}
+.path-fill{height:100%;border-radius:5px;background:rgba(255,255,255,.5);transition:width 1s ease}
+.path-dots{position:absolute;bottom:calc(26% + 2px);left:60px;right:60px;height:6px;z-index:1;display:flex;gap:20px;padding:0 20px}
 
-/* Game nodes */
-.nodes{display:flex;align-items:flex-end;gap:clamp(40px,10vw,80px);padding-bottom:20%;position:relative;z-index:2}
+/* Nodes */
+.nodes{
+  position:absolute;bottom:18%;left:60px;right:60px;z-index:2;
+  display:flex;align-items:flex-end;gap:clamp(50px,12vw,100px);
+}
 
-.gnode{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;position:relative}
-.gnode-circle{
-  width:clamp(70px,18vw,90px);height:clamp(70px,18vw,90px);border-radius:50%;
+.gn{display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;position:relative}
+
+.gn-circle{
+  width:clamp(100px,26vw,130px);height:clamp(100px,26vw,130px);border-radius:50%;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  border:4px solid rgba(255,255,255,.5);position:relative;transition:all .2s;
+  border:5px solid rgba(255,255,255,.5);position:relative;transition:all .25s;
 }
-.gnode-circle .ico{font-size:clamp(1.6rem,4.5vw,2.2rem);line-height:1}
-.gnode-label{font-size:.68rem;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.15)}
+.gn-circle .ico{font-size:clamp(2.4rem,7vw,3.2rem);line-height:1}
+.gn-name{
+  font-size:clamp(.8rem,2.2vw,.95rem);font-weight:900;color:#fff;
+  text-shadow:0 2px 6px rgba(0,0,0,.2);text-align:center;
+}
 
-.gnode.active .gnode-circle{
-  box-shadow:0 6px 28px var(--glow);cursor:pointer;
+/* Active node: even bigger */
+.gn.active .gn-circle{
+  width:clamp(115px,30vw,150px);height:clamp(115px,30vw,150px);
+  border-width:6px;cursor:pointer;
+  box-shadow:0 8px 36px var(--glow);
   animation:gpulse 2s ease-in-out infinite;
-  width:clamp(80px,20vw,100px);height:clamp(80px,20vw,100px);
 }
-.gnode.active .gnode-circle:active{transform:scale(.88)}
-@keyframes gpulse{0%,100%{box-shadow:0 6px 28px var(--glow)}50%{box-shadow:0 8px 36px var(--glow),0 0 0 10px var(--glow2)}}
-
-.gnode.active .play-badge{
-  position:absolute;top:-10px;right:-10px;background:#fff;color:var(--gc);
-  font-size:.55rem;font-weight:900;padding:3px 8px;border-radius:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,.1);animation:badge-bounce 1.5s ease-in-out infinite;
+.gn.active .gn-circle:active{transform:scale(.88)}
+@keyframes gpulse{
+  0%,100%{box-shadow:0 8px 36px var(--glow)}
+  50%{box-shadow:0 10px 44px var(--glow),0 0 0 14px var(--glow2)}
 }
-@keyframes badge-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-
-.gnode.locked .gnode-circle{
-  background:rgba(255,255,255,.15) !important;border:3px dashed rgba(255,255,255,.2);
-  width:clamp(56px,14vw,70px);height:clamp(56px,14vw,70px);
+.gn.active .badge{
+  position:absolute;top:-14px;right:-8px;background:#fff;color:var(--gc);
+  font-size:.7rem;font-weight:900;padding:5px 12px;border-radius:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,.12);animation:bb 1.2s ease-in-out infinite;
 }
-.gnode.locked .ico{filter:grayscale(1);opacity:.35}
-.gnode.locked .gnode-label{opacity:.35}
-.gnode-lock{position:absolute;bottom:-4px;right:-4px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;font-size:.6rem}
+@keyframes bb{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
 
-/* Offset nodes vertically for path feel */
-.gnode:nth-child(odd){margin-bottom:20px}
-.gnode:nth-child(even){margin-bottom:50px}
+/* Locked node: smaller */
+.gn.locked .gn-circle{
+  width:clamp(70px,18vw,88px);height:clamp(70px,18vw,88px);
+  background:rgba(255,255,255,.12) !important;border:4px dashed rgba(255,255,255,.2);
+}
+.gn.locked .ico{filter:grayscale(1);opacity:.3}
+.gn.locked .gn-name{opacity:.3}
+.gn-lock{
+  position:absolute;bottom:-4px;right:-4px;width:26px;height:26px;border-radius:50%;
+  background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-size:.7rem;
+}
+
+/* Offset nodes up/down for wavy path feel */
+.gn:nth-child(1){margin-bottom:30px}
+.gn:nth-child(2){margin-bottom:70px}
+.gn:nth-child(3){margin-bottom:20px}
+.gn:nth-child(4){margin-bottom:60px}
+.gn:nth-child(5){margin-bottom:10px}
+.gn:nth-child(6){margin-bottom:55px}
+.gn:nth-child(7){margin-bottom:35px}
+
+/* Mascot on active node */
+.mascot-on-node{
+  position:absolute;z-index:10;pointer-events:none;
+  transition:all 1s cubic-bezier(.34,1.56,.64,1);
+}
+.mascot-on-node svg{overflow:visible;filter:drop-shadow(0 4px 12px rgba(0,160,144,.25))}
+.m-body{animation:mi 2.5s ease-in-out infinite}
+@keyframes mi{0%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
 
 /* Talking */
 .talking .m-mouth-open{display:block !important}
 .talking .m-mouth-smile{display:none}
 .talking .m-body{animation:tb .3s ease-in-out infinite alternate}
-@keyframes tb{0%{transform:translateY(0)}100%{transform:translateY(-2px)}}
-
-/* Idle */
-.m-body{animation:mi 2.5s ease-in-out infinite}
-@keyframes mi{0%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}}
+@keyframes tb{0%{transform:translateY(0) scale(1)}100%{transform:translateY(-3px) scale(1.03)}}
 
 /* Tap overlay */
-.tap-ov{position:fixed;inset:0;z-index:50;background:rgba(232,255,248,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .5s}
-.tap-ov .tap-btn{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#00D4B8,#00A090);display:flex;align-items:center;justify-content:center;font-size:2.8rem;box-shadow:0 0 0 0 rgba(0,160,144,.25);animation:gpulse 2s ease-in-out infinite;--glow:rgba(0,160,144,.25);--glow2:rgba(0,160,144,.08)}
-.tap-ov h2{font-size:1.2rem;font-weight:900;color:#0a4a40;margin-top:16px}
-.tap-ov p{font-size:.78rem;color:rgba(10,74,64,.35);margin-top:4px}
+.tap-ov{position:fixed;inset:0;z-index:50;background:rgba(200,245,234,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .5s}
+.tap-btn{
+  width:130px;height:130px;border-radius:50%;
+  background:linear-gradient(135deg,#00D4B8,#00A090);
+  display:flex;align-items:center;justify-content:center;font-size:3.5rem;
+  box-shadow:0 0 0 0 rgba(0,160,144,.25);animation:gpulse 2s ease-in-out infinite;
+  --glow:rgba(0,160,144,.3);--glow2:rgba(0,160,144,.1);
+}
+.tap-ov h2{font-size:1.4rem;font-weight:900;color:#0a4a40;margin-top:18px}
+.tap-ov p{font-size:.85rem;color:rgba(10,74,64,.3);margin-top:4px}
 
 /* Tech */
-.tech-link{position:fixed;bottom:8px;right:12px;font-size:.55rem;color:rgba(0,80,60,.1);cursor:pointer;z-index:3}
-.tp{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.4);padding:16px;overflow-y:auto;align-items:center;justify-content:center}
+.tech-link{position:fixed;bottom:6px;right:10px;font-size:.5rem;color:rgba(0,60,40,.08);cursor:pointer;z-index:3}
+.tp{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.35);padding:16px;overflow-y:auto;align-items:center;justify-content:center}
 .tp.on{display:flex}
-.tp-inner{max-width:480px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.15)}
+.tp-inner{max-width:440px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.15)}
 .tp-head{background:#00A090;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
-.tp-head h2{color:#fff;font-size:.9rem;font-weight:800}
+.tp-head h2{color:#fff;font-size:.88rem;font-weight:800}
 .tp-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:.85rem}
 .tp-body{padding:14px 18px;font-size:.78rem;color:#1a3a2a;line-height:1.7}
 .tp-body a{color:#00A090;font-weight:700}
 .tp-field{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
-.tp-field input,.tp-field select{padding:6px 10px;border:1.5px solid #d0e8e0;border-radius:8px;font-size:.76rem;font-family:inherit}
-.tp-btn{margin-top:8px;padding:9px;background:#00A090;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:.78rem;cursor:pointer;width:100%}
-.tp-mod{padding:8px 12px;margin:4px 0;border-radius:8px;border:1.5px solid #e0f0ea;display:flex;align-items:center;gap:8px;font-size:.75rem}
+.tp-field input,.tp-field select{padding:6px 10px;border:1.5px solid #d0e8e0;border-radius:8px;font-size:.75rem;font-family:inherit}
+.tp-btn{margin-top:6px;padding:9px;background:#00A090;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:.78rem;cursor:pointer;width:100%}
+.tp-mod{padding:6px 10px;margin:4px 0;border-radius:8px;border:1.5px solid #e0f0ea;display:flex;align-items:center;gap:8px;font-size:.72rem}
 </style>
 </head>
 <body>
 
-<!-- Tap overlay -->
 <div class="tap-ov" id="tap-ov" onclick="startWelcome()">
   <div class="tap-btn">🧩</div>
   <h2>Toca para começar!</h2>
   <p>Os teus jogos estão à espera</p>
 </div>
 
-<div class="world">
-  <!-- Top bar: mascot + bubble -->
-  <div class="top" id="top-bar">
-    <svg viewBox="0 0 100 110" width="70" height="77" style="overflow:visible">
-      <g class="m-body">
-        <ellipse cx="50" cy="62" rx="36" ry="40" fill="url(#mhg2)"/>
-        <ellipse cx="50" cy="70" rx="22" ry="20" fill="rgba(255,255,255,.15)"/>
-        <ellipse cx="28" cy="22" rx="11" ry="10" fill="#00D4B8"/><ellipse cx="28" cy="22" rx="7" ry="6" fill="#4de8d0"/>
-        <ellipse cx="72" cy="22" rx="11" ry="10" fill="#00D4B8"/><ellipse cx="72" cy="22" rx="7" ry="6" fill="#4de8d0"/>
-        <ellipse cx="37" cy="52" rx="11" ry="12" fill="#fff"/><ellipse cx="63" cy="52" rx="11" ry="12" fill="#fff"/>
-        <circle cx="39" cy="53" r="6" fill="#0a3a30"/><circle cx="65" cy="53" r="6" fill="#0a3a30"/>
-        <circle cx="42" cy="49" r="2.5" fill="#fff" opacity=".9"/><circle cx="68" cy="49" r="2.5" fill="#fff" opacity=".9"/>
-        <ellipse cx="37" cy="52" rx="13" ry="0" fill="#00A090"><animate attributeName="ry" values="0;14;0" dur=".18s" begin="3s;7s" fill="freeze"/></ellipse>
-        <ellipse cx="63" cy="52" rx="13" ry="0" fill="#00A090"><animate attributeName="ry" values="0;14;0" dur=".18s" begin="3s;7s" fill="freeze"/></ellipse>
-        <circle cx="24" cy="62" r="7" fill="#4de8d0" opacity=".3"/>
-        <circle cx="76" cy="62" r="7" fill="#4de8d0" opacity=".3"/>
-        <ellipse cx="50" cy="63" rx="2.5" ry="2" fill="#007a6c"/>
-        <path d="M43 72 Q50 80 57 72" stroke="#007a6c" stroke-width="2" fill="none" stroke-linecap="round" class="m-mouth-smile"/>
-        <ellipse cx="50" cy="75" rx="7" ry="6" fill="#007a6c" class="m-mouth-open" style="display:none"/>
-        <ellipse cx="36" cy="103" rx="11" ry="6" fill="#00A090"/><ellipse cx="64" cy="103" rx="11" ry="6" fill="#00A090"/>
-      </g>
-      <defs><linearGradient id="mhg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00D4B8"/><stop offset="100%" stop-color="#00A090"/></linearGradient></defs>
-    </svg>
-    <div class="top-bubble" id="bubble">Olá! Escolhe um jogo!</div>
+<div class="world" id="world">
+  <div class="top-speech">
+    <div class="speech" id="speech">Olá! Escolhe um jogo!</div>
   </div>
 
-  <!-- Horizontal scroll area -->
-  <div class="scroll-area">
-    <div class="landscape">
+  <div class="scroll" id="scroll">
+    <div class="land" id="land">
       <!-- Clouds -->
-      <div class="cloud" style="width:80px;height:30px;top:10%;left:15%;border-radius:30px;opacity:.4"></div>
-      <div class="cloud" style="width:60px;height:22px;top:18%;left:55%;border-radius:20px;opacity:.3"></div>
-      <div class="cloud" style="width:100px;height:35px;top:8%;left:80%;border-radius:35px;opacity:.35"></div>
+      <div class="cloud" style="width:100px;height:36px;top:6%;left:12%"></div>
+      <div class="cloud" style="width:70px;height:26px;top:14%;left:45%"></div>
+      <div class="cloud" style="width:120px;height:40px;top:4%;left:72%"></div>
+      <div class="cloud" style="width:80px;height:28px;top:18%;left:90%"></div>
 
       <!-- Ground -->
       <div class="ground"></div>
 
-      <!-- Path line -->
-      <div class="path-line"><div class="path-line-fill"></div></div>
+      <!-- Path track -->
+      <div class="path-track"><div class="path-fill" style="width:14%"></div></div>
+
+      <!-- Floating mascot (positioned over active node by JS) -->
+      <div class="mascot-on-node" id="mascot-float">
+        <svg viewBox="0 0 100 110" width="80" height="88" style="overflow:visible">
+          <g class="m-body">
+            <ellipse cx="50" cy="62" rx="36" ry="40" fill="url(#mg)"/>
+            <ellipse cx="50" cy="70" rx="22" ry="20" fill="rgba(255,255,255,.15)"/>
+            <ellipse cx="28" cy="22" rx="11" ry="10" fill="#00D4B8"/><ellipse cx="28" cy="22" rx="7" ry="6" fill="#4de8d0"/>
+            <ellipse cx="72" cy="22" rx="11" ry="10" fill="#00D4B8"/><ellipse cx="72" cy="22" rx="7" ry="6" fill="#4de8d0"/>
+            <ellipse cx="37" cy="52" rx="11" ry="12" fill="#fff"/><ellipse cx="63" cy="52" rx="11" ry="12" fill="#fff"/>
+            <circle cx="39" cy="53" r="6" fill="#0a3a30"/><circle cx="65" cy="53" r="6" fill="#0a3a30"/>
+            <circle cx="42" cy="49" r="2.5" fill="#fff" opacity=".9"/><circle cx="68" cy="49" r="2.5" fill="#fff" opacity=".9"/>
+            <ellipse cx="37" cy="52" rx="13" ry="0" fill="#00A090"><animate attributeName="ry" values="0;14;0" dur=".18s" begin="2.5s;6s;9s" fill="freeze"/></ellipse>
+            <ellipse cx="63" cy="52" rx="13" ry="0" fill="#00A090"><animate attributeName="ry" values="0;14;0" dur=".18s" begin="2.5s;6s;9s" fill="freeze"/></ellipse>
+            <circle cx="24" cy="64" r="7" fill="#4de8d0" opacity=".3"/><circle cx="76" cy="64" r="7" fill="#4de8d0" opacity=".3"/>
+            <ellipse cx="50" cy="63" rx="2.5" ry="2" fill="#007a6c"/>
+            <path d="M42 73 Q50 82 58 73" stroke="#007a6c" stroke-width="2.5" fill="none" stroke-linecap="round" class="m-mouth-smile"/>
+            <ellipse cx="50" cy="76" rx="8" ry="6" fill="#007a6c" class="m-mouth-open" style="display:none"/>
+            <ellipse cx="36" cy="100" rx="12" ry="6" fill="#00A090"/><ellipse cx="64" cy="100" rx="12" ry="6" fill="#00A090"/>
+          </g>
+          <defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00D4B8"/><stop offset="100%" stop-color="#00A090"/></linearGradient></defs>
+        </svg>
+      </div>
 
       <!-- Game nodes -->
-      <div class="nodes">
-        <!-- 1: LETRAS — ACTIVE -->
-        <a href="LETRAS_ID.html" class="gnode active" style="--glow:rgba(232,93,117,.35);--glow2:rgba(232,93,117,.1);--gc:#E85D75">
-          <div class="gnode-circle" style="background:linear-gradient(145deg,#FF8A9E,#E85D75)">
-            <span class="ico">🔤</span>
-            <div class="play-badge">JOGAR!</div>
-          </div>
-          <span class="gnode-label">Letras</span>
+      <div class="nodes" id="nodes">
+        <a href="LETRAS_ID.html" class="gn active" id="gn-0" style="--glow:rgba(232,93,117,.35);--glow2:rgba(232,93,117,.12);--gc:#E85D75">
+          <div class="gn-circle" style="background:linear-gradient(145deg,#FF8A9E,#E85D75)"><span class="ico">🔤</span><div class="badge">JOGAR!</div></div>
+          <span class="gn-name">Letras</span>
         </a>
-
-        <!-- 2: MEM_VISUAL — LOCKED -->
-        <div class="gnode locked">
-          <div class="gnode-circle" style="--gc:#F5A623"><span class="ico">🧠</span><div class="gnode-lock">🔒</div></div>
-          <span class="gnode-label">Memória</span>
-        </div>
-
-        <!-- 3: COD_ESPECIAL -->
-        <div class="gnode locked">
-          <div class="gnode-circle" style="--gc:#7C6DD8"><span class="ico">🔮</span><div class="gnode-lock">🔒</div></div>
-          <span class="gnode-label">Código</span>
-        </div>
-
-        <!-- 4: SINT_COMP / TACCSi -->
-        <div class="gnode locked">
-          <div class="gnode-circle" style="--gc:#4A90D9"><span class="ico">🖼️</span><div class="gnode-lock">🔒</div></div>
-          <span class="gnode-label">Frases</span>
-        </div>
-
-        <!-- 5: SEMELHANCAS -->
-        <div class="gnode locked">
-          <div class="gnode-circle" style="--gc:#5CB85C"><span class="ico">🪢</span><div class="gnode-lock">🔒</div></div>
-          <span class="gnode-label">Parecidos</span>
-        </div>
-
-        <!-- 6: NRC -->
-        <div class="gnode locked">
-          <div class="gnode-circle" style="--gc:#D4537E"><span class="ico">⚡</span><div class="gnode-lock">🔒</div></div>
-          <span class="gnode-label">Rápido</span>
-        </div>
-
-        <!-- 7: MORF_PROD -->
-        <div class="gnode locked">
-          <div class="gnode-circle" style="--gc:#E67E22"><span class="ico">🧩</span><div class="gnode-lock">🔒</div></div>
-          <span class="gnode-label">Palavras</span>
-        </div>
+        <div class="gn locked" id="gn-1"><div class="gn-circle" style="background:linear-gradient(145deg,#FFC85A,#F5A623)"><span class="ico">🧠</span><div class="gn-lock">🔒</div></div><span class="gn-name">Memória</span></div>
+        <div class="gn locked" id="gn-2"><div class="gn-circle" style="background:linear-gradient(145deg,#A08AEE,#7C6DD8)"><span class="ico">🔮</span><div class="gn-lock">🔒</div></div><span class="gn-name">Código</span></div>
+        <div class="gn locked" id="gn-3"><div class="gn-circle" style="background:linear-gradient(145deg,#6AABEF,#4A90D9)"><span class="ico">🖼️</span><div class="gn-lock">🔒</div></div><span class="gn-name">Frases</span></div>
+        <div class="gn locked" id="gn-4"><div class="gn-circle" style="background:linear-gradient(145deg,#7DD87D,#5CB85C)"><span class="ico">🪢</span><div class="gn-lock">🔒</div></div><span class="gn-name">Parecidos</span></div>
+        <div class="gn locked" id="gn-5"><div class="gn-circle" style="background:linear-gradient(145deg,#F080A8,#D4537E)"><span class="ico">⚡</span><div class="gn-lock">🔒</div></div><span class="gn-name">Rápido</span></div>
+        <div class="gn locked" id="gn-6"><div class="gn-circle" style="background:linear-gradient(145deg,#F0A050,#E67E22)"><span class="ico">🧩</span><div class="gn-lock">🔒</div></div><span class="gn-name">Palavras</span></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Tech link -->
 <div class="tech-link" onclick="document.getElementById('tp').classList.add('on')">técnico</div>
-
-<!-- Tech panel -->
 <div class="tp" id="tp" onclick="if(event.target===this)this.classList.remove('on')">
   <div class="tp-inner">
     <div class="tp-head"><h2>Área do técnico</h2><button class="tp-close" onclick="document.getElementById('tp').classList.remove('on')">✕</button></div>
     <div class="tp-body">
       <p style="font-weight:800;margin-bottom:4px">Criança ativa</p>
-      <div id="tc-active" style="font-size:.75rem;color:#888;margin-bottom:6px">Nenhuma</div>
+      <div id="tc-a" style="font-size:.75rem;color:#888;margin-bottom:6px">Nenhuma</div>
       <div class="tp-field">
         <input id="tc-id" placeholder="Código"><input id="tc-dob" type="date">
         <select id="tc-sex"><option value="">Sexo</option><option value="F">F</option><option value="M">M</option></select>
@@ -226,55 +234,64 @@ body{background:#E8FFF8}
         <input id="tc-tech" placeholder="Técnico" style="grid-column:1/-1">
       </div>
       <label style="display:flex;align-items:center;gap:5px;font-size:.72rem;color:#666;margin:4px 0 6px;cursor:pointer"><input type="checkbox" id="tc-plnm"> PLNM</label>
-      <button class="tp-btn" onclick="saveChild()">Ativar criança</button>
-      <div style="margin-top:12px;border-top:1px solid #e8f0ec;padding-top:10px">
-        <p style="font-weight:800;font-size:.75rem;margin-bottom:4px">Módulos</p>
-        <div class="tp-mod" style="border-color:#E85D75"><div style="width:8px;height:8px;border-radius:50%;background:#E85D75"></div><a href="LETRAS_ID.html?admin=1">Identificação de Letras</a><span style="font-size:.55rem;font-weight:800;color:#00A090;margin-left:auto">Pronto</span></div>
-        <div class="tp-mod"><div style="width:8px;height:8px;border-radius:50%;background:#ccc"></div><span style="color:#aaa">Memória Visual · Em desenvolvimento</span></div>
+      <button class="tp-btn" onclick="saveC()">Ativar criança</button>
+      <div style="margin-top:10px;border-top:1px solid #e8f0ec;padding-top:8px">
+        <div class="tp-mod" style="border-color:#E85D75"><div style="width:8px;height:8px;border-radius:50%;background:#E85D75;flex-shrink:0"></div><a href="LETRAS_ID.html?admin=1">Identificação de Letras</a><span style="font-size:.55rem;font-weight:800;color:#00A090;margin-left:auto">Pronto</span></div>
+        <div class="tp-mod"><div style="width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0"></div><span style="color:#aaa">Mais módulos em desenvolvimento</span></div>
       </div>
-      <p style="font-size:.55rem;color:#ccc;margin-top:10px">NEXTHIE · CENTRO2030-FSE+-02336600 · Joana Miguel</p>
+      <p style="font-size:.5rem;color:#ccc;margin-top:8px">NEXTHIE · CENTRO2030-FSE+-02336600 · Joana Miguel</p>
     </div>
   </div>
 </div>
 
 <script>
+// Position mascot above active node
+function posMascot(){
+  const active=document.querySelector('.gn.active');
+  const m=document.getElementById('mascot-float');
+  if(!active||!m)return;
+  const circle=active.querySelector('.gn-circle');
+  const r=circle.getBoundingClientRect();
+  const land=document.getElementById('land').getBoundingClientRect();
+  m.style.left=(r.left-land.left+r.width/2-40)+'px';
+  m.style.bottom=(land.bottom-r.top+10)+'px';
+}
+setTimeout(posMascot,100);
+window.addEventListener('resize',posMascot);
+document.getElementById('scroll').addEventListener('scroll',posMascot);
+
+// Welcome
 const W1='Olá! Vamos jogar? Estes são os jogos que tens para ti. À medida que fores jogando, aparecem jogos novos! Diverte-te!';
 const W2='Toca num jogo para começares!';
 const BB=['Olá! Vamos jogar? 🎉','Estes são os teus jogos!','Jogos novos vão aparecendo! ✨','Diverte-te! 🎈','Toca num jogo para começares! 👆'];
-
 function gv(){const v=speechSynthesis.getVoices(),p=v.filter(x=>x.lang==='pt-PT'),a=v.filter(x=>x.lang.startsWith('pt'));return p.find(x=>/femin|female|joana|ines|raquel/i.test(x.name))||p[0]||a[0]||null}
 
 function startWelcome(){const o=document.getElementById('tap-ov');o.style.opacity='0';setTimeout(()=>o.style.display='none',500);playWelcome()}
 
 function playWelcome(){
-  const tb=document.getElementById('top-bar'),bb=document.getElementById('bubble');
-  bb.classList.add('on');bb.textContent=BB[0];
+  const w=document.getElementById('world'),sp=document.getElementById('speech');
+  sp.classList.add('on');sp.textContent=BB[0];
   speechSynthesis.cancel();
-  let pi=0;const pt=setInterval(()=>{pi++;if(pi<BB.length)bb.textContent=BB[pi]},2000);
-  const voice=gv();
-  tb.classList.add('talking');
+  let pi=0;const pt=setInterval(()=>{pi++;if(pi<BB.length)sp.textContent=BB[pi]},2000);
+  const voice=gv();w.classList.add('talking');
   const u1=new SpeechSynthesisUtterance(W1);u1.lang='pt-PT';u1.rate=.85;u1.pitch=1.15;if(voice)u1.voice=voice;
   u1.onend=()=>{setTimeout(()=>{
-    bb.textContent=BB[BB.length-1];
+    sp.textContent=BB[BB.length-1];
     const u2=new SpeechSynthesisUtterance(W2);u2.lang='pt-PT';u2.rate=.8;u2.pitch=1.15;if(voice)u2.voice=voice;
-    u2.onend=()=>dn(pt,tb,bb);u2.onerror=()=>dn(pt,tb,bb);
-    speechSynthesis.speak(u2);
+    u2.onend=()=>dn(pt,w,sp);u2.onerror=()=>dn(pt,w,sp);speechSynthesis.speak(u2);
   },700)};
-  u1.onerror=()=>dn(pt,tb,bb);
-  speechSynthesis.speak(u1);
+  u1.onerror=()=>dn(pt,w,sp);speechSynthesis.speak(u1);
 }
-function dn(t,tb,bb){clearInterval(t);tb.classList.remove('talking');bb.textContent='Toca num jogo! 👆';setTimeout(()=>bb.classList.remove('on'),4000)}
-
+function dn(t,w,sp){clearInterval(t);w.classList.remove('talking');sp.textContent='Toca num jogo! 👆';setTimeout(()=>sp.classList.remove('on'),4000)}
 if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=()=>{};
 
-function saveChild(){
-  const id=document.getElementById('tc-id').value.trim(),dob=document.getElementById('tc-dob').value;
-  if(!id||!dob){alert('Código e data de nascimento.');return}
-  localStorage.setItem('nexthie_active_child',JSON.stringify({id,dob,sex:document.getElementById('tc-sex').value,sch:document.getElementById('tc-sch').value.trim(),tech:document.getElementById('tc-tech').value.trim(),plnm:document.getElementById('tc-plnm').checked}));
-  loadC();alert('Criança ativada: '+id);
-}
-function loadC(){try{const c=JSON.parse(localStorage.getItem('nexthie_active_child')),e=document.getElementById('tc-active');if(c&&c.id){e.innerHTML='<b style="color:#00A090">'+c.id+'</b> · '+c.dob;document.getElementById('tc-id').value=c.id;document.getElementById('tc-dob').value=c.dob;document.getElementById('tc-sex').value=c.sex||'';document.getElementById('tc-sch').value=c.sch||'';document.getElementById('tc-tech').value=c.tech||'';document.getElementById('tc-plnm').checked=c.plnm||false}else{e.textContent='Nenhuma'}}catch(e){}}
+// Child
+function saveC(){const id=document.getElementById('tc-id').value.trim(),dob=document.getElementById('tc-dob').value;if(!id||!dob){alert('Código e data de nascimento.');return}localStorage.setItem('nexthie_active_child',JSON.stringify({id,dob,sex:document.getElementById('tc-sex').value,sch:document.getElementById('tc-sch').value.trim(),tech:document.getElementById('tc-tech').value.trim(),plnm:document.getElementById('tc-plnm').checked}));loadC();alert('Criança ativada: '+id)}
+function loadC(){try{const c=JSON.parse(localStorage.getItem('nexthie_active_child')),e=document.getElementById('tc-a');if(c&&c.id){e.innerHTML='<b style="color:#00A090">'+c.id+'</b> · '+c.dob;document.getElementById('tc-id').value=c.id;document.getElementById('tc-dob').value=c.dob;document.getElementById('tc-sex').value=c.sex||'';document.getElementById('tc-sch').value=c.sch||'';document.getElementById('tc-tech').value=c.tech||'';document.getElementById('tc-plnm').checked=c.plnm||false}else{e.textContent='Nenhuma'}}catch(e){}}
 loadC();
+
+// Grass tufts
+(function(){const g=document.querySelector('.ground');if(!g)return;for(let i=0;i<30;i++){const t=document.createElement('div');t.className='tuft';t.style.cssText=`left:${Math.random()*100}%;bottom:${92+Math.random()*6}%;width:${16+Math.random()*16}px;height:${8+Math.random()*10}px;background:hsl(${145+Math.random()*15},${50+Math.random()*20}%,${50+Math.random()*15}%)`;g.appendChild(t)}})();
 </script>
 </body>
 </html>
