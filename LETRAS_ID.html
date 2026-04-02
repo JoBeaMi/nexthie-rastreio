@@ -1227,11 +1227,50 @@ updateSheetsStatus();
 const _origStartSession = startSession;
 startSession = function() {
   _origStartSession();
-  // If session started successfully (S.id is set), save child
   if (S.id) {
     saveChild({ id: S.id, dob: S.dob, sex: S.sex, sch: S.sch, plnm: S.plnm });
   }
 };
+
+// ── AUTO-PLAY MODE ──
+// If URL has ?play=1 and there's an active child in localStorage,
+// skip setup and go straight to instructions (child-facing flow per F21)
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('play') !== '1') return;
+
+  try {
+    const child = JSON.parse(localStorage.getItem('nexthie_active_child'));
+    if (!child || !child.id || !child.dob) return;
+
+    // Set up session from stored child data
+    const dt = new Date().toISOString().slice(0, 10);
+    const d1 = new Date(child.dob), d2 = new Date(dt);
+    const am = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+
+    S.id = child.id;
+    S.dob = child.dob;
+    S.sex = child.sex || '';
+    S.sch = child.sch || '';
+    S.ex = child.tech || '';
+    S.dt = dt;
+    S.plnm = child.plnm || false;
+    S.am = am;
+    S.letterCase = 'upper';
+    S.sessionId = 'LID-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 5).toUpperCase();
+    S.items = buildItems(S.letterCase);
+    S.resp = {};
+    S.el = 0;
+    S.ci = 0;
+    S.blocked = false;
+
+    // Skip welcome + setup → go straight to instructions
+    go('si');
+  } catch (e) {
+    // If anything fails, fall back to normal setup
+    console.log('Auto-play failed, showing setup:', e);
+  }
+})();
 </script>
 </body>
 </html>
