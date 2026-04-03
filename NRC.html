@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Nomeação Rápida · NEXTHIE</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif; background: #1a1020; }
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+.scr { display: none; height: 100dvh; width: 100%; flex-direction: column; overflow: hidden; }
+.scr.on { display: flex; }
+
+:root {
+  --caidi: #00A090; --caidi-light: #00D4B8; --mint: #E0F7F4;
+  --rosa: #D4537E; --rosa-light: #E876A0; --rosa-bg: rgba(212,83,126,.08);
+  --rosa-glow: rgba(212,83,126,.25); --rosa-dark: #B03A62;
+  --bg: #f5f2f0; --border: #e0d8d2; --muted: #7a6e66;
+  --dark: #2a1a2e; --white: #fff;
+  --sel: var(--rosa); --sel-glow: var(--rosa-glow);
+}
+
+/* ══════════ WELCOME ══════════ */
+#sw {
+  background: #1a1020;
+  align-items: stretch; justify-content: flex-start;
+  overflow-y: auto; position: relative;
+}
+#sw::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(212,83,126,.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%, rgba(0,160,144,.10) 0%, transparent 60%);
+}
+.w-inner {
+  position:relative; z-index:1; width:100%; max-width:560px; margin:0 auto;
+  padding:0 0 32px; display:flex; flex-direction:column; align-items:center;
+}
+.w-hero { padding:44px 36px 28px; display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; }
+.w-instrument-tag {
+  display:inline-flex; align-items:center; gap:7px;
+  background:rgba(212,83,126,.12); border:1px solid rgba(212,83,126,.3);
+  border-radius:6px; padding:4px 12px; margin-bottom:20px;
+  font-size:.6rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--rosa-light);
+}
+.w-instrument-tag::before {
+  content:''; width:6px; height:6px; border-radius:50%;
+  background:var(--rosa-light); flex-shrink:0; box-shadow:0 0 8px var(--rosa-light);
+}
+.w-acronym {
+  font-size:clamp(2.8rem, 8vw, 4rem); font-weight:900; color:#fff;
+  letter-spacing:-2px; line-height:1; margin-bottom:10px;
+}
+.w-acronym-accent { color:var(--rosa); }
+.w-fullname { font-size:.85rem; color:rgba(255,255,255,.45); line-height:1.6; font-style:italic; }
+
+.w-preview-strip {
+  display:flex; gap:8px; padding:20px 16px; width:100%; justify-content:center; flex-wrap:wrap;
+  border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.02);
+}
+.w-color-dot {
+  width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  border:2px solid rgba(255,255,255,.15); transition:all .3s;
+}
+.w-color-dot:nth-child(odd) { animation: floatUp 3s ease-in-out infinite; }
+.w-color-dot:nth-child(even) { animation: floatUp 3s ease-in-out .5s infinite; }
+.w-animal-dot {
+  width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+  font-size:1.4rem; background:rgba(212,83,126,.12); border:1.5px solid rgba(212,83,126,.2);
+}
+.w-animal-dot:nth-child(odd) { animation: floatUp 3s ease-in-out .2s infinite; }
+.w-animal-dot:nth-child(even) { animation: floatUp 3s ease-in-out .7s infinite; }
+@keyframes floatUp { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+.w-cta-block { padding:24px 36px; display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; }
+.w-cta-block p { font-size:.75rem; color:rgba(255,255,255,.3); line-height:1.65; margin-bottom:18px; max-width:380px; }
+.w-cta { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+
+.w-credits { padding:24px 36px 0; width:100%; text-align:center; }
+.w-credits-label { font-size:.55rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:rgba(255,255,255,.2); margin-bottom:12px; }
+.w-author-name { font-size:.78rem; font-weight:700; color:rgba(255,255,255,.7); line-height:1.3; }
+.w-author-detail { font-size:.62rem; color:rgba(255,255,255,.28); margin-top:1px; line-height:1.4; }
+.w-div { height:1px; background:rgba(255,255,255,.06); margin:14px 0; }
+.w-copy { font-size:.58rem; color:rgba(255,255,255,.18); line-height:1.7; }
+
+/* ══════════ BUTTONS ══════════ */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:12px 26px; border-radius:11px; border:none; cursor:pointer; font-family:inherit; font-weight:700; transition:all .14s; font-size:.93rem; }
+.btn-main { background:var(--rosa); color:#fff; } .btn-main:hover { background:var(--rosa-dark); transform:translateY(-1px); }
+.btn-out  { background:transparent; color:#fff; border:2px solid rgba(255,255,255,.3); } .btn-out:hover { border-color:rgba(255,255,255,.65); }
+.btn-rosa { background:var(--rosa); color:#fff; } .btn-rosa:hover { background:var(--rosa-dark); }
+.btn-ghost { background:transparent; color:var(--rosa); border:2px solid var(--border); } .btn-ghost:hover { border-color:var(--rosa); background:var(--rosa-bg); }
+.btn-white { background:#fff; color:var(--dark); } .btn-white:hover { background:#f0f0f0; }
+.btn-sm { padding:8px 16px; font-size:.82rem; border-radius:8px; }
+.btn-lg { padding:15px 32px; font-size:1.02rem; }
+.btn-danger { background:#c0392b; color:#fff; } .btn-danger:hover { background:#a93226; }
+.bk { background:rgba(255,255,255,.1); border:none; color:#fff; width:34px; height:34px; border-radius:7px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.bk:hover { background:rgba(255,255,255,.2); }
+
+/* ══════════ SETUP ══════════ */
+#ss { background:var(--bg); overflow-y:auto; }
+.hdr { background:var(--dark); padding:20px 28px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.hdr h2 { color:#fff; font-size:1.25rem; font-weight:700; }
+.hdr p  { color:rgba(255,255,255,.38); font-size:.78rem; margin-top:1px; }
+.s-body { padding:24px 28px; max-width:660px; margin:0 auto; width:100%; }
+.s-sec  { font-size:.61rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; margin-top:20px; }
+.fg2 { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+.fg  { display:flex; flex-direction:column; gap:3px; }
+.fg.fw { grid-column:1/-1; }
+label { font-size:.76rem; font-weight:600; color:var(--dark); }
+input:not([type=radio]):not([type=checkbox]), select { padding:9px 11px; border:2px solid var(--border); border-radius:8px; font-family:inherit; font-size:.88rem; background:#fff; width:100%; transition:border-color .14s; }
+input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none; border-color:var(--rosa); box-shadow:0 0 0 3px var(--rosa-glow); }
+.age-dsp { min-height:42px; background:var(--rosa-bg); border:2px solid var(--rosa); border-radius:8px; padding:9px 11px; font-weight:600; color:var(--rosa); display:flex; align-items:center; font-size:.88rem; }
+.s-foot { padding:14px 28px; border-top:1px solid var(--border); background:#fff; display:flex; justify-content:flex-end; gap:9px; flex-shrink:0; }
+.req { color:var(--rosa); font-weight:700; }
+
+/* Subtask picker */
+.subtask-picker { display:flex; gap:10px; margin-top:6px; }
+.subtask-opt {
+  flex:1; padding:14px; border:2.5px solid var(--border); border-radius:12px; cursor:pointer;
+  text-align:center; background:#fff; transition:all .15s; position:relative;
+}
+.subtask-opt.active { border-color:var(--rosa); background:var(--rosa-bg); }
+.subtask-opt .so-icon { font-size:1.6rem; margin-bottom:6px; }
+.subtask-opt .so-label { font-size:.8rem; font-weight:700; color:var(--dark); }
+.subtask-opt .so-desc { font-size:.65rem; color:var(--muted); margin-top:2px; }
+.subtask-opt .so-check {
+  position:absolute; top:8px; right:8px; width:20px; height:20px; border-radius:50%;
+  border:2px solid var(--border); display:flex; align-items:center; justify-content:center;
+  font-size:.7rem; color:#fff; transition:all .15s;
+}
+.subtask-opt.active .so-check { background:var(--rosa); border-color:var(--rosa); }
+
+/* ══════════ INSTRUCTIONS ══════════ */
+#si { background:var(--bg); }
+.i-wrap { flex:1; display:flex; align-items:center; justify-content:center; padding:24px 18px; }
+.i-card { background:#fff; border-radius:14px; box-shadow:0 4px 28px rgba(0,0,0,.11); max-width:580px; width:100%; overflow:hidden; }
+.i-head { background:linear-gradient(135deg,var(--dark),#3a2a4a); padding:22px; color:#fff; }
+.i-head h2 { font-size:1.4rem; font-weight:800; margin-bottom:2px; }
+.i-head p  { color:rgba(255,255,255,.42); font-size:.8rem; }
+.i-body { padding:20px 22px; }
+.i-script { background:var(--rosa-bg); border-left:4px solid var(--rosa); padding:13px 16px; border-radius:0 8px 8px 0; font-size:.95rem; line-height:1.7; font-style:italic; color:var(--dark); margin-bottom:14px; }
+.i-notes { list-style:disc; padding-left:16px; color:var(--muted); font-size:.8rem; line-height:1.7; }
+.i-foot { padding:14px 22px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:9px; }
+
+/* ══════════ GRID SCREEN ══════════ */
+#sg { background:var(--bg); }
+.g-bar { background:var(--dark); padding:7px 16px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; gap:10px; }
+.g-l   { display:flex; align-items:center; gap:7px; min-width:0; }
+.g-nm  { background:rgba(255,255,255,.11); border-radius:5px; padding:2px 9px; color:#fff; font-size:.7rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px; }
+.g-tk  { background:var(--rosa); border-radius:5px; padding:2px 9px; color:#fff; font-size:.68rem; font-weight:700; white-space:nowrap; }
+.g-r   { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.tmr   { font-size:.82rem; font-weight:700; color:#fff; background:rgba(255,255,255,.08); padding:2px 9px; border-radius:5px; letter-spacing:1px; font-variant-numeric:tabular-nums; }
+
+/* Recording indicator */
+.rec-bar {
+  background:linear-gradient(135deg,#2a0a18,#3a1a28); padding:10px 20px;
+  display:flex; align-items:center; justify-content:center; gap:14px; flex-shrink:0;
+  border-bottom:3px solid var(--rosa);
+}
+.rec-bar.idle { background:linear-gradient(135deg,#f5f2f0,#ebe6e2); border-bottom-color:var(--border); }
+.rec-dot {
+  width:14px; height:14px; border-radius:50%; background:#ff3b30; flex-shrink:0;
+  animation:pulse-rec 1s ease-in-out infinite;
+}
+.rec-bar.idle .rec-dot { background:#ccc; animation:none; }
+@keyframes pulse-rec { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,59,48,.5)} 50%{opacity:.7;box-shadow:0 0 0 8px rgba(255,59,48,0)} }
+.rec-label { font-size:.78rem; font-weight:700; color:#fff; letter-spacing:1px; text-transform:uppercase; }
+.rec-bar.idle .rec-label { color:var(--muted); }
+.rec-timer { font-size:1.1rem; font-weight:800; color:#fff; font-variant-numeric:tabular-nums; letter-spacing:1px; }
+.rec-bar.idle .rec-timer { color:var(--dark); }
+.asr-live { font-size:.7rem; color:rgba(255,255,255,.5); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rec-bar.idle .asr-live { color:var(--muted); }
+
+/* The RAN grid */
+.grid-wrap {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding:12px; overflow:auto; min-height:0;
+}
+.ran-grid {
+  display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;
+  max-width:520px; width:100%;
+}
+.ran-cell {
+  aspect-ratio:1; border-radius:12px; display:flex; align-items:center; justify-content:center;
+  border:3px solid rgba(0,0,0,.08); background:#fff; position:relative;
+  transition:all .15s; font-size:clamp(1.6rem, 4vw, 2.2rem);
+}
+/* Color cells */
+.ran-cell.c-azul     { background:#2979FF; border-color:#1565C0; }
+.ran-cell.c-vermelho { background:#F44336; border-color:#C62828; }
+.ran-cell.c-verde    { background:#43A047; border-color:#2E7D32; }
+.ran-cell.c-preto    { background:#424242; border-color:#212121; }
+.ran-cell.c-amarelo  { background:#FFD600; border-color:#F9A825; }
+/* Animal cells — white bg with emoji */
+.ran-cell.a-gato::after  { content:'🐱'; }
+.ran-cell.a-cao::after   { content:'🐶'; }
+.ran-cell.a-peixe::after { content:'🐟'; }
+.ran-cell.a-pato::after  { content:'🦆'; }
+.ran-cell.a-vaca::after  { content:'🐄'; }
+
+/* Row numbers (left side) */
+.row-num {
+  font-size:.55rem; font-weight:700; color:var(--muted); text-align:center;
+  padding:2px 0; grid-column:1/-1; margin-top:2px;
+}
+
+/* Grid controls */
+.grid-controls {
+  padding:12px 20px; background:#fff; border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; gap:12px; flex-shrink:0;
+}
+
+/* ══════════ REVIEW ══════════ */
+#sv { background:var(--bg); overflow-y:auto; }
+.rev-grid {
+  display:grid; grid-template-columns:repeat(5, 1fr); gap:4px;
+  max-width:480px; width:100%; margin:0 auto;
+}
+.rev-cell {
+  aspect-ratio:1; border-radius:10px; display:flex; align-items:center; justify-content:center;
+  border:3px solid rgba(0,0,0,.08); background:#fff; position:relative;
+  cursor:pointer; transition:all .12s; font-size:clamp(1.2rem, 3vw, 1.6rem);
+}
+.rev-cell .rev-badge {
+  position:absolute; top:-4px; right:-4px; width:22px; height:22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:.65rem; font-weight:900;
+  color:#fff; z-index:2; border:2px solid #fff;
+}
+.rev-cell[data-status="C"] .rev-badge { background:#2e8b57; }
+.rev-cell[data-status="E"] .rev-badge { background:#c0392b; }
+.rev-cell[data-status="AC"] .rev-badge { background:#e67e22; }
+.rev-cell[data-status="O"] .rev-badge { background:#7f8c8d; }
+/* Color cells in review */
+.rev-cell.c-azul     { background:#2979FF; }
+.rev-cell.c-vermelho { background:#F44336; }
+.rev-cell.c-verde    { background:#43A047; }
+.rev-cell.c-preto    { background:#424242; }
+.rev-cell.c-amarelo  { background:#FFD600; }
+.rev-cell.a-gato::after  { content:'🐱'; }
+.rev-cell.a-cao::after   { content:'🐶'; }
+.rev-cell.a-peixe::after { content:'🐟'; }
+.rev-cell.a-pato::after  { content:'🦆'; }
+.rev-cell.a-vaca::after  { content:'🐄'; }
+
+.rev-legend {
+  display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+  font-size:.72rem; color:var(--muted); margin:12px 0;
+}
+.rev-legend span { display:flex; align-items:center; gap:4px; }
+.rev-legend .dot { width:12px; height:12px; border-radius:50%; }
+
+/* Audio player in review */
+.rev-audio { margin:16px 0; text-align:center; }
+.rev-audio audio { width:100%; max-width:400px; border-radius:8px; }
+
+/* ══════════ RESULTS ══════════ */
+#sr { background:var(--bg); overflow-y:auto; }
+.r-hdr { background:var(--dark); padding:18px 28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:11px; flex-shrink:0; }
+.r-hdr-l h2 { color:#fff; font-size:1.3rem; font-weight:800; }
+.r-hdr-l p  { color:rgba(255,255,255,.38); font-size:.74rem; margin-top:2px; }
+.r-hdr-r { display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+.r-body { padding:20px 24px; max-width:820px; margin:0 auto; width:100%; }
+
+.r-child { background:#fff; border-radius:14px; padding:16px 20px; box-shadow:0 2px 14px rgba(0,0,0,.07); margin-bottom:16px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.r-child-av { width:48px; height:48px; border-radius:14px; background:var(--rosa); display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:900; color:#fff; flex-shrink:0; }
+.r-child-info { flex:1; min-width:0; }
+.r-child-name { font-size:1.05rem; font-weight:800; color:var(--dark); }
+.r-child-meta { font-size:.72rem; color:var(--muted); margin-top:2px; }
+.r-child-age { background:var(--rosa-bg); border:1.5px solid var(--rosa); border-radius:10px; padding:8px 14px; text-align:center; flex-shrink:0; }
+.r-child-age .ca-v { font-size:1.3rem; font-weight:900; color:var(--rosa); line-height:1; }
+.r-child-age .ca-l { font-size:.6rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+
+.r-subtask-card {
+  background:#fff; border-radius:14px; padding:20px; box-shadow:0 2px 14px rgba(0,0,0,.07);
+  margin-bottom:16px;
+}
+.r-subtask-card h3 { font-size:.9rem; font-weight:800; color:var(--dark); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.r-metric-row { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:14px; }
+.r-metric {
+  text-align:center; padding:12px 8px; border-radius:10px; background:#f8f5f3;
+}
+.r-metric .rv { font-size:1.5rem; font-weight:900; line-height:1; }
+.r-metric .rl { font-size:.62rem; color:var(--muted); margin-top:4px; font-weight:600; }
+
+/* Sync badge */
+.sync-badge { font-size:.72rem; padding:3px 10px; border-radius:6px; font-weight:600; }
+.sync-badge.wait { background:#fff8e1; color:#b07d00; }
+.sync-badge.ok   { background:#e8f8ee; color:#2e8b57; }
+.sync-badge.fail { background:#fff0f0; color:#c04040; }
+
+/* Toast */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--dark); color:#fff; padding:10px 22px; border-radius:10px; font-size:.85rem; font-weight:600; z-index:999; opacity:0; transition:all .3s; pointer-events:none; }
+.toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* Mic permission */
+.mic-prompt {
+  padding:20px; text-align:center; background:#fff8e1; border:2px solid #f0c040;
+  border-radius:12px; margin:12px 0;
+}
+.mic-prompt .mic-icon { font-size:2rem; margin-bottom:8px; }
+.mic-prompt p { font-size:.82rem; color:#5a4000; line-height:1.6; }
+
+@media (max-width:480px) {
+  .w-hero, .w-cta-block, .w-credits { padding-left:22px; padding-right:22px; }
+  .ran-grid { gap:4px; }
+  .ran-cell { border-width:2px; border-radius:8px; }
+  .r-metric-row { grid-template-columns:1fr 1fr; }
+}
+@media print {
+  .scr { display:none !important; }
+  #sr { display:flex !important; overflow:visible; height:auto; }
+  .r-hdr-r, .s-foot, .grid-controls { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ WELCOME ══════ -->
+<div id="sw" class="scr on">
+ <div class="w-inner">
+  <div class="w-hero">
+    <div class="w-instrument-tag">NEXTHIE · Rastreio Digital</div>
+    <div class="w-acronym" style="font-size:clamp(2rem, 6vw, 3rem);letter-spacing:-1px">Nomeação<span class="w-acronym-accent"> Rápida</span></div>
+    <div class="w-fullname">Cores e Animais · 2 grelhas × 50 itens · Velocidade de nomeação</div>
+  </div>
+
+  <div class="w-preview-strip" id="preview-strip">
+    <div class="w-color-dot" style="background:#2979FF"></div>
+    <div class="w-color-dot" style="background:#F44336"></div>
+    <div class="w-color-dot" style="background:#43A047"></div>
+    <div class="w-color-dot" style="background:#424242"></div>
+    <div class="w-color-dot" style="background:#FFD600"></div>
+    <div style="width:12px"></div>
+    <div class="w-animal-dot">🐱</div>
+    <div class="w-animal-dot">🐶</div>
+    <div class="w-animal-dot">🐟</div>
+    <div class="w-animal-dot">🦆</div>
+    <div class="w-animal-dot">🐄</div>
+  </div>
+
+  <div class="w-cta-block">
+    <p>Módulo de rastreio digital para nomeação rápida automatizada (RAN). A criança nomeia em voz alta cores e animais numa grelha, o mais rapidamente possível. O sistema grava áudio e transcreve via ASR.</p>
+    <div class="w-cta">
+      <button class="btn btn-main btn-lg" onclick="go('ss')">Iniciar sessão</button>
+    </div>
+  </div>
+
+  <div class="w-credits">
+    <div class="w-credits-label">Projeto</div>
+    <div style="margin-bottom:12px">
+      <div class="w-author-name">NEXTHIE — CENTRO2030-FSE+-02336600</div>
+      <div class="w-author-detail">CAIDI · CLUNL · UNINOVA · Câmara Municipal de Torres Vedras · Grupo Patrícia Pilar</div>
+    </div>
+    <div class="w-credits-label">Coordenação clínica</div>
+    <div style="margin-bottom:16px">
+      <div class="w-author-name">Joana Miguel</div>
+      <div class="w-author-detail">CAIDI · CLUNL · Universidade Nova de Lisboa</div>
+    </div>
+    <div class="w-div"></div>
+    <div class="w-copy">
+      © 2026 CAIDI. Referência clínica: RAN — Cores e Animais (Denckla &amp; Rudel, 1976).<br>
+      Sequência e formato digital © NEXTHIE. NRC v1.0
+    </div>
+  </div>
+ </div>
+</div>
+
+<!-- ══════ SETUP ══════ -->
+<div id="ss" class="scr">
+  <div class="hdr">
+    <button class="bk" onclick="go('sw')">←</button>
+    <div><h2>Nova Sessão</h2><p>Nomeação Rápida — Cores e Animais</p></div>
+  </div>
+  <div class="s-body">
+    <div class="s-sec">Criança <span style="font-weight:400;color:#999">* obrigatório</span></div>
+    <div id="child-picker" style="margin-bottom:12px"></div>
+    <div class="fg2" id="child-fields">
+      <div class="fg"><label>Código da criança <span class="req">*</span></label>
+        <input id="fid" type="text" placeholder="Ex: NEXTHIE-001" autocomplete="off"></div>
+      <div class="fg"><label>Data de nascimento <span class="req">*</span></label>
+        <input id="fdob" type="date" onchange="calcAge()"></div>
+      <div class="fg"><label>Idade calculada</label>
+        <div class="age-dsp" id="adsp">—</div></div>
+      <div class="fg"><label>Sexo</label>
+        <select id="fsx"><option value="">— Selecionar —</option><option value="F">Feminino</option><option value="M">Masculino</option></select></div>
+      <div class="fg fw"><label>Escola / Instituição <span class="req">*</span></label>
+        <input id="fsch" type="text" autocomplete="off"></div>
+      <div class="fg fw" style="margin-top:6px">
+        <label style="display:flex;align-items:center;gap:10px;font-weight:500;cursor:pointer;padding:10px 14px;background:#fff8e1;border:1px solid #f0c040;border-radius:8px;color:#5a4000">
+          <input type="checkbox" id="fplnm" style="width:18px;height:18px;margin:0;cursor:pointer;accent-color:#c08000">
+          🌐 Português língua não materna
+        </label>
+      </div>
+    </div>
+
+    <div class="s-sec" style="margin-top:22px">Sessão</div>
+    <div class="fg2">
+      <div class="fg"><label>Técnico <span class="req">*</span></label>
+        <input id="fex" type="text" autocomplete="off"></div>
+      <div class="fg"><label>Data <span class="req">*</span></label>
+        <input id="fdt" type="date"></div>
+      <div class="fg fw"><label>Observações</label>
+        <input id="fnt" type="text" placeholder="Opcional" autocomplete="off"></div>
+    </div>
+
+    <div class="s-sec" style="margin-top:22px">Subtarefas</div>
+    <div class="subtask-picker">
+      <div class="subtask-opt active" id="opt-cores" onclick="toggleSubtask('cores')">
+        <div class="so-check">✓</div>
+        <div class="so-icon">🎨</div>
+        <div class="so-label">NRC_CORES</div>
+        <div class="so-desc">5 cores · 50 itens</div>
+      </div>
+      <div class="subtask-opt active" id="opt-animais" onclick="toggleSubtask('animais')">
+        <div class="so-check">✓</div>
+        <div class="so-icon">🐾</div>
+        <div class="so-label">NRC_ANIMAIS</div>
+        <div class="so-desc">5 animais · 50 itens</div>
+      </div>
+    </div>
+
+    <div class="s-sec" style="margin-top:22px">Ligação Google Sheets</div>
+    <div style="padding:12px 14px;background:#fff;border:1.5px solid var(--border);border-radius:9px">
+      <div id="sheets-status" style="font-size:.8rem;margin-bottom:8px"></div>
+      <button class="btn btn-ghost btn-sm" onclick="testSheets()" id="btn-test-sheets" style="display:none">🔗 Testar ligação</button>
+    </div>
+  </div>
+  <div class="s-foot">
+    <button class="btn btn-ghost btn-sm" onclick="go('sw')">Cancelar</button>
+    <button class="btn btn-rosa btn-sm" onclick="startSession()">Começar →</button>
+  </div>
+</div>
+
+<!-- ══════ INSTRUCTIONS ══════ -->
+<div id="si" class="scr">
+  <div class="hdr">
+    <button class="bk" onclick="go('ss')">←</button>
+    <div><h2>Instruções</h2><p id="si-subtitle">Nomeação Rápida</p></div>
+  </div>
+  <div class="i-wrap">
+    <div class="i-card">
+      <div class="i-head">
+        <h2 id="si-title">Nomeação Rápida de Cores</h2>
+        <p id="si-desc">50 itens · grelha 5×10 · tarefa cronometrada</p>
+      </div>
+      <div class="i-body">
+        <div class="i-script" id="si-script">
+          «Vais ver uns quadrados com cores. Quero que digas o nome de cada cor, o mais depressa que conseguires, sem te enganares. Começas aqui em cima, da esquerda para a direita, como se estivesses a ler. Pronta/o?»
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px;font-weight:600">Notas para o técnico:</div>
+        <ul class="i-notes" id="si-notes">
+          <li>Confirme que o microfone está ligado e com permissão</li>
+          <li>A gravação inicia ao premir "Começar gravação"</li>
+          <li>A criança nomeia todas as cores da esquerda para a direita, linha a linha</li>
+          <li>Se a criança se enganar, encorajá-la a continuar sem corrigir</li>
+          <li>Prima "Parar" quando a criança terminar todos os 50 itens</li>
+          <li>A correção é feita depois no ecrã de revisão</li>
+        </ul>
+        <div class="mic-prompt" id="mic-prompt" style="display:none">
+          <div class="mic-icon">🎙️</div>
+          <p>O navegador vai pedir permissão para o microfone.<br>Por favor, autorize para continuar.</p>
+        </div>
+      </div>
+      <div class="i-foot">
+        <button class="btn btn-ghost btn-sm" onclick="goBackFromInstructions()">← Voltar</button>
+        <button class="btn btn-rosa" id="btn-start-grid" onclick="requestMicAndStart()">🎙 Começar →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ GRID + RECORDING ══════ -->
+<div id="sg" class="scr">
+  <div class="g-bar">
+    <div class="g-l">
+      <span class="g-nm" id="g-nm">—</span>
+      <span class="g-tk" id="g-tk">NRC_CORES</span>
+    </div>
+    <div class="g-r">
+      <div class="tmr" id="g-tm">00:00</div>
+    </div>
+  </div>
+  <div class="rec-bar idle" id="rec-bar">
+    <div class="rec-dot"></div>
+    <div class="rec-label" id="rec-label">Pronto</div>
+    <div class="rec-timer" id="rec-timer">00:00.0</div>
+    <div class="asr-live" id="asr-live"></div>
+  </div>
+  <div class="grid-wrap">
+    <div class="ran-grid" id="ran-grid"></div>
+  </div>
+  <div class="grid-controls" id="grid-controls">
+    <button class="btn btn-rosa btn-lg" id="btn-rec" onclick="toggleRecording()">🎙 Começar gravação</button>
+    <button class="btn btn-danger btn-sm" id="btn-stop" onclick="stopRecording()" style="display:none">⏹ Parar</button>
+  </div>
+</div>
+
+<!-- ══════ REVIEW ══════ -->
+<div id="sv" class="scr">
+  <div class="hdr">
+    <button class="bk" onclick="skipReview()">←</button>
+    <div><h2>Revisão</h2><p id="sv-subtitle">Correção da terapeuta</p></div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:20px 24px">
+    <div style="max-width:660px;margin:0 auto">
+      <div id="rev-section-cores" style="display:none">
+        <div style="font-size:.9rem;font-weight:800;color:var(--dark);margin-bottom:8px">🎨 NRC_CORES</div>
+        <div class="rev-audio" id="rev-audio-cores"></div>
+        <div class="rev-legend">
+          <span><div class="dot" style="background:#2e8b57"></div> C = Correto</span>
+          <span><div class="dot" style="background:#c0392b"></div> E = Erro</span>
+          <span><div class="dot" style="background:#e67e22"></div> AC = Autocorreção</span>
+          <span><div class="dot" style="background:#7f8c8d"></div> O = Omissão</span>
+        </div>
+        <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-bottom:10px">Toque em cada célula para alternar: C → E → AC → O</p>
+        <div class="rev-grid" id="rev-grid-cores"></div>
+      </div>
+      <div id="rev-section-animais" style="display:none;margin-top:28px">
+        <div style="font-size:.9rem;font-weight:800;color:var(--dark);margin-bottom:8px">🐾 NRC_ANIMAIS</div>
+        <div class="rev-audio" id="rev-audio-animais"></div>
+        <div class="rev-legend">
+          <span><div class="dot" style="background:#2e8b57"></div> C = Correto</span>
+          <span><div class="dot" style="background:#c0392b"></div> E = Erro</span>
+          <span><div class="dot" style="background:#e67e22"></div> AC = Autocorreção</span>
+          <span><div class="dot" style="background:#7f8c8d"></div> O = Omissão</span>
+        </div>
+        <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-bottom:10px">Toque em cada célula para alternar: C → E → AC → O</p>
+        <div class="rev-grid" id="rev-grid-animais"></div>
+      </div>
+      <div style="text-align:center;padding:20px 0">
+        <button class="btn btn-rosa btn-lg" onclick="finishReview()">Guardar revisão →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ RESULTS ══════ -->
+<div id="sr" class="scr">
+  <div class="r-hdr">
+    <div class="r-hdr-l"><h2>Resultados — Nomeação Rápida</h2><p id="r-meta">—</p></div>
+    <div class="r-hdr-r">
+      <span id="sync-status"></span>
+      <button class="btn btn-out btn-sm" onclick="doCSV()">⬇ CSV</button>
+      <button class="btn btn-out btn-sm" onclick="doJSON()">💾 JSON</button>
+      <button class="btn btn-white btn-sm" onclick="window.print()">🖨</button>
+    </div>
+  </div>
+  <div class="r-body">
+    <div class="r-child">
+      <div class="r-child-av" id="r-av">—</div>
+      <div class="r-child-info">
+        <div class="r-child-name" id="r-name">—</div>
+        <div class="r-child-meta" id="r-childmeta">—</div>
+      </div>
+      <div class="r-child-age">
+        <div class="ca-v" id="r-agestr">—</div>
+        <div class="ca-l">Idade</div>
+      </div>
+    </div>
+    <div id="r-subtasks"></div>
+    <div id="r-audio-downloads"></div>
+    <div style="text-align:center;padding:12px 0 32px">
+      <button class="btn btn-rosa btn-lg" onclick="newSession()">Nova Sessão</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">—</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════ */
+const SHEETS_URL = ''; // ← paste Google Apps Script URL here
+const MODULE_CODE = 'NRC';
+const MODULE_VERSION = '1.0';
+const GRID_COLS = 5;
+const GRID_ROWS = 10;
+const ITEMS_PER_GRID = GRID_COLS * GRID_ROWS; // 50
+
+/* ══════════════════════════════════════════════════════
+   STIMULI
+══════════════════════════════════════════════════════ */
+const CORES = [
+  { id:'azul',     label:'azul',     css:'c-azul' },
+  { id:'vermelho', label:'vermelho', css:'c-vermelho' },
+  { id:'verde',    label:'verde',    css:'c-verde' },
+  { id:'preto',    label:'preto',    css:'c-preto' },
+  { id:'amarelo',  label:'amarelo',  css:'c-amarelo' },
+];
+
+const ANIMAIS = [
+  { id:'gato',  label:'gato',  css:'a-gato' },
+  { id:'cao',   label:'cão',   css:'a-cao' },
+  { id:'peixe', label:'peixe', css:'a-peixe' },
+  { id:'pato',  label:'pato',  css:'a-pato' },
+  { id:'vaca',  label:'vaca',  css:'a-vaca' },
+];
+
+/* ══════════════════════════════════════════════════════
+   PSEUDO-RANDOM SEQUENCE GENERATION
+   Constraint: no two consecutive items are the same
+   (reading order: left→right, top→bottom)
+   Each item appears exactly ITEMS_PER_GRID/items.length times
+══════════════════════════════════════════════════════ */
+function generateSequence(items) {
+  const countEach = ITEMS_PER_GRID / items.length; // 10
+  const maxAttempts = 200;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const remaining = {};
+    items.forEach(it => remaining[it.id] = countEach);
+    const seq = [];
+    let lastId = null;
+    let stuck = false;
+
+    for (let i = 0; i < ITEMS_PER_GRID; i++) {
+      const available = items.filter(it => remaining[it.id] > 0 && it.id !== lastId);
+      if (available.length === 0) { stuck = true; break; }
+
+      // Weighted random pick (prefer items with more remaining to avoid dead-ends)
+      const totalRem = available.reduce((s, it) => s + remaining[it.id], 0);
+      let r = Math.random() * totalRem;
+      let picked = available[0];
+      for (const it of available) {
+        r -= remaining[it.id];
+        if (r <= 0) { picked = it; break; }
+      }
+
+      seq.push(picked);
+      remaining[picked.id]--;
+      lastId = picked.id;
+    }
+
+    if (!stuck && seq.length === ITEMS_PER_GRID) {
+      // Verify constraint
+      let valid = true;
+      for (let i = 1; i < seq.length; i++) {
+        if (seq[i].id === seq[i-1].id) { valid = false; break; }
+      }
+      if (valid) return seq;
+    }
+  }
+  // Fallback: should never reach here with 5 items and 50 slots
+  console.warn('Sequence generation: using fallback');
+  return generateSequenceFallback(items);
+}
+
+function generateSequenceFallback(items) {
+  // Simple round-robin shuffle
+  const countEach = ITEMS_PER_GRID / items.length;
+  const seq = [];
+  for (let r = 0; r < countEach; r++) {
+    const shuffled = [...items].sort(() => Math.random() - 0.5);
+    seq.push(...shuffled);
+  }
+  return seq;
+}
+
+/* ══════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════ */
+let S = {
+  id:'', dob:'', sex:'', sch:'', ex:'', dt:'', nt:'', plnm:false,
+  am:0, sessionId:'',
+  subtasks: { cores:true, animais:true },
+  // Per-subtask data
+  runs: {} // keyed by 'cores' or 'animais'
+};
+
+// Current run context
+let currentRun = null; // 'cores' or 'animais'
+let runState = null;   // { sequence, status[], audioBlob, asrText, timeMs, recording }
+
+// Audio recording state
+let mediaRecorder = null;
+let audioChunks = [];
+let audioStream = null;
+let recognition = null;
+let recStartTime = null;
+let recTimerInterval = null;
+
+/* ══════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════ */
+function go(id) {
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2800);
+}
+
+/* ══════════════════════════════════════════════════════
+   AGE CALCULATION
+══════════════════════════════════════════════════════ */
+function calcAge() {
+  const dob = document.getElementById('fdob').value;
+  const dt  = document.getElementById('fdt').value || new Date().toISOString().slice(0,10);
+  if (!dob) { document.getElementById('adsp').textContent = '—'; return; }
+  const d1 = new Date(dob), d2 = new Date(dt);
+  const months = (d2.getFullYear()-d1.getFullYear())*12 + (d2.getMonth()-d1.getMonth());
+  const y = Math.floor(months/12), m = months%12;
+  S.am = months;
+  document.getElementById('adsp').textContent = `${y} anos, ${m} meses (${months}m)`;
+}
+
+/* ══════════════════════════════════════════════════════
+   SUBTASK TOGGLE
+══════════════════════════════════════════════════════ */
+function toggleSubtask(which) {
+  S.subtasks[which] = !S.subtasks[which];
+  const el = document.getElementById('opt-' + which);
+  el.classList.toggle('active', S.subtasks[which]);
+  // Must have at least one
+  if (!S.subtasks.cores && !S.subtasks.animais) {
+    S.subtasks[which] = true;
+    el.classList.add('active');
+    toast('⚠ Selecione pelo menos uma subtarefa');
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   SESSION START
+══════════════════════════════════════════════════════ */
+function startSession() {
+  const id  = document.getElementById('fid').value.trim();
+  const dob = document.getElementById('fdob').value;
+  const sch = document.getElementById('fsch').value.trim();
+  const ex  = document.getElementById('fex').value.trim();
+  const dt  = document.getElementById('fdt').value;
+  const errs = [];
+  if (!id)  errs.push('código da criança');
+  if (!dob) errs.push('data de nascimento');
+  if (!sch) errs.push('escola');
+  if (!ex)  errs.push('técnico');
+  if (!dt)  errs.push('data da sessão');
+  if (errs.length) { toast('⚠ Preencha: ' + errs.join(', ')); return; }
+
+  S.id = id; S.dob = dob;
+  S.sex = document.getElementById('fsx').value;
+  S.sch = sch; S.ex = ex; S.dt = dt;
+  S.nt = document.getElementById('fnt').value;
+  S.plnm = document.getElementById('fplnm')?.checked || false;
+  S.sessionId = 'NRC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,5).toUpperCase();
+  S.runs = {};
+  calcAge();
+
+  // Save child to localStorage
+  saveChild({ id: S.id, dob: S.dob, sex: S.sex, sch: S.sch, plnm: S.plnm });
+
+  // Determine first subtask
+  if (S.subtasks.cores) {
+    prepareSubtask('cores');
+  } else {
+    prepareSubtask('animais');
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   PREPARE SUBTASK (instructions screen)
+══════════════════════════════════════════════════════ */
+function prepareSubtask(which) {
+  currentRun = which;
+  const items = which === 'cores' ? CORES : ANIMAIS;
+  const seq = generateSequence(items);
+
+  runState = {
+    sequence: seq,
+    status: new Array(ITEMS_PER_GRID).fill('C'), // default: all correct
+    audioBlob: null,
+    asrText: '',
+    asrInterim: '',
+    timeMs: 0,
+    startedAt: null,
+    completedAt: null,
+  };
+
+  // Update instruction screen
+  if (which === 'cores') {
+    document.getElementById('si-title').textContent = 'Nomeação Rápida de Cores';
+    document.getElementById('si-desc').textContent = '50 itens · grelha 5×10 · tarefa cronometrada';
+    document.getElementById('si-subtitle').textContent = 'NRC_CORES';
+    document.getElementById('si-script').innerHTML =
+      '«Vais ver uns quadrados com cores. Quero que digas o nome de cada cor, o mais depressa que conseguires, sem te enganares. Começas aqui em cima, da esquerda para a direita, como se estivesses a ler. Pronta/o?»';
+    const notes = document.getElementById('si-notes');
+    notes.innerHTML = `
+      <li>Confirme que o microfone está ligado e com permissão</li>
+      <li>A gravação inicia ao premir "Começar gravação"</li>
+      <li>A criança nomeia todas as cores da esquerda para a direita, linha a linha</li>
+      <li>Se a criança se enganar, encorajá-la a continuar sem parar</li>
+      <li>Prima "Parar" quando a criança terminar todos os 50 itens</li>
+      <li>A correção é feita depois no ecrã de revisão</li>`;
+  } else {
+    document.getElementById('si-title').textContent = 'Nomeação Rápida de Animais';
+    document.getElementById('si-desc').textContent = '50 itens · grelha 5×10 · tarefa cronometrada';
+    document.getElementById('si-subtitle').textContent = 'NRC_ANIMAIS';
+    document.getElementById('si-script').innerHTML =
+      '«Agora vais ver animais. Quero que digas o nome de cada animal, o mais depressa que conseguires, sem te enganares. Começas aqui em cima, da esquerda para a direita. Pronta/o?»';
+    const notes = document.getElementById('si-notes');
+    notes.innerHTML = `
+      <li>Confirme que o microfone continua ativo</li>
+      <li>Procedimento idêntico ao das cores</li>
+      <li>A criança nomeia todos os animais da esquerda para a direita, linha a linha</li>
+      <li>Se a criança se enganar, encorajá-la a continuar</li>
+      <li>Prima "Parar" quando a criança terminar todos os 50 itens</li>`;
+  }
+
+  document.getElementById('mic-prompt').style.display = 'none';
+  document.getElementById('btn-start-grid').disabled = false;
+  document.getElementById('btn-start-grid').textContent = '🎙 Começar →';
+  go('si');
+}
+
+function goBackFromInstructions() {
+  // If this is the second subtask, can't go back to setup easily
+  // Just go back to setup
+  go('ss');
+}
+
+/* ══════════════════════════════════════════════════════
+   MIC PERMISSION & START GRID
+══════════════════════════════════════════════════════ */
+async function requestMicAndStart() {
+  document.getElementById('mic-prompt').style.display = '';
+  document.getElementById('btn-start-grid').disabled = true;
+  document.getElementById('btn-start-grid').textContent = '⏳ A pedir permissão…';
+
+  try {
+    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    document.getElementById('mic-prompt').style.display = 'none';
+    showGrid();
+  } catch(err) {
+    document.getElementById('mic-prompt').innerHTML = `
+      <div class="mic-icon">❌</div>
+      <p style="color:#c04040">Não foi possível aceder ao microfone.<br>
+      Verifique as permissões do navegador e tente novamente.</p>`;
+    document.getElementById('btn-start-grid').disabled = false;
+    document.getElementById('btn-start-grid').textContent = '🎙 Tentar novamente';
+    console.error('Mic error:', err);
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   SHOW GRID
+══════════════════════════════════════════════════════ */
+function showGrid() {
+  go('sg');
+  const label = currentRun === 'cores' ? 'NRC_CORES' : 'NRC_ANIMAIS';
+  document.getElementById('g-nm').textContent = S.id;
+  document.getElementById('g-tk').textContent = label;
+  document.getElementById('g-tm').textContent = '00:00';
+
+  // Reset recording UI
+  const recBar = document.getElementById('rec-bar');
+  recBar.className = 'rec-bar idle';
+  document.getElementById('rec-label').textContent = 'Pronto';
+  document.getElementById('rec-timer').textContent = '00:00.0';
+  document.getElementById('asr-live').textContent = '';
+  document.getElementById('btn-rec').style.display = '';
+  document.getElementById('btn-stop').style.display = 'none';
+
+  // Build grid
+  const gridEl = document.getElementById('ran-grid');
+  gridEl.innerHTML = '';
+  runState.sequence.forEach((item, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'ran-cell ' + item.css;
+    cell.setAttribute('data-pos', i);
+    gridEl.appendChild(cell);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   RECORDING — MediaRecorder + ASR
+══════════════════════════════════════════════════════ */
+function toggleRecording() {
+  startRecordingFull();
+}
+
+function startRecordingFull() {
+  audioChunks = [];
+
+  // MediaRecorder for audio blob
+  try {
+    mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm;codecs=opus' });
+  } catch(e) {
+    // Fallback
+    mediaRecorder = new MediaRecorder(audioStream);
+  }
+  mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+  mediaRecorder.onstop = () => {
+    runState.audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+  };
+  mediaRecorder.start(500); // collect data every 500ms
+
+  // ASR — Web Speech API
+  runState.asrText = '';
+  runState.asrInterim = '';
+  try {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'pt-PT';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event) => {
+        let interim = '';
+        let final = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript + ' ';
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        if (final) runState.asrText += final;
+        runState.asrInterim = interim;
+        document.getElementById('asr-live').textContent = interim || '…';
+      };
+
+      recognition.onerror = (e) => { console.warn('ASR error:', e.error); };
+      recognition.onend = () => {
+        // Restart if still recording
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          try { recognition.start(); } catch(e) {}
+        }
+      };
+      recognition.start();
+    }
+  } catch(e) {
+    console.warn('ASR not available:', e);
+  }
+
+  // Timer
+  recStartTime = Date.now();
+  runState.startedAt = new Date().toISOString();
+  recTimerInterval = setInterval(updateRecTimer, 100);
+
+  // UI update
+  const recBar = document.getElementById('rec-bar');
+  recBar.className = 'rec-bar';
+  document.getElementById('rec-label').textContent = 'A GRAVAR';
+  document.getElementById('btn-rec').style.display = 'none';
+  document.getElementById('btn-stop').style.display = '';
+}
+
+function updateRecTimer() {
+  if (!recStartTime) return;
+  const elapsed = Date.now() - recStartTime;
+  const s = Math.floor(elapsed / 1000);
+  const ms = Math.floor((elapsed % 1000) / 100);
+  const mm = String(Math.floor(s / 60)).padStart(2, '0');
+  const ss = String(s % 60).padStart(2, '0');
+  document.getElementById('rec-timer').textContent = `${mm}:${ss}.${ms}`;
+  document.getElementById('g-tm').textContent = `${mm}:${ss}`;
+}
+
+function stopRecording() {
+  // Stop timer
+  const elapsed = recStartTime ? Date.now() - recStartTime : 0;
+  runState.timeMs = elapsed;
+  runState.completedAt = new Date().toISOString();
+  if (recTimerInterval) clearInterval(recTimerInterval);
+  recTimerInterval = null;
+  recStartTime = null;
+
+  // Stop ASR
+  if (recognition) {
+    try { recognition.stop(); } catch(e) {}
+    recognition = null;
+  }
+
+  // Stop MediaRecorder
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+  }
+
+  // Save run
+  S.runs[currentRun] = {
+    sequence: runState.sequence.map(it => it.id),
+    status: [...runState.status],
+    timeMs: runState.timeMs,
+    asrText: (runState.asrText + runState.asrInterim).trim(),
+    audioBlob: runState.audioBlob, // will be set after onstop fires
+    startedAt: runState.startedAt,
+    completedAt: runState.completedAt,
+  };
+
+  // Small delay to let MediaRecorder finish
+  setTimeout(() => {
+    // Update audioBlob if ready
+    if (runState.audioBlob) {
+      S.runs[currentRun].audioBlob = runState.audioBlob;
+    }
+    proceedAfterGrid();
+  }, 500);
+}
+
+/* ══════════════════════════════════════════════════════
+   AFTER GRID — next subtask or review
+══════════════════════════════════════════════════════ */
+function proceedAfterGrid() {
+  // Check if there's a next subtask
+  if (currentRun === 'cores' && S.subtasks.animais) {
+    // Release and re-acquire mic for next subtask? No, keep the stream
+    prepareSubtask('animais');
+  } else {
+    // Go to review
+    showReview();
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   REVIEW SCREEN
+══════════════════════════════════════════════════════ */
+function showReview() {
+  // Release mic stream
+  if (audioStream) {
+    audioStream.getTracks().forEach(t => t.stop());
+    audioStream = null;
+  }
+
+  go('sv');
+
+  // Build review grids
+  if (S.runs.cores) {
+    document.getElementById('rev-section-cores').style.display = '';
+    buildRevGrid('cores');
+    buildRevAudio('cores');
+  } else {
+    document.getElementById('rev-section-cores').style.display = 'none';
+  }
+
+  if (S.runs.animais) {
+    document.getElementById('rev-section-animais').style.display = '';
+    buildRevGrid('animais');
+    buildRevAudio('animais');
+  } else {
+    document.getElementById('rev-section-animais').style.display = 'none';
+  }
+}
+
+function buildRevGrid(which) {
+  const run = S.runs[which];
+  const items = which === 'cores' ? CORES : ANIMAIS;
+  const itemMap = {};
+  items.forEach(it => itemMap[it.id] = it);
+
+  const gridEl = document.getElementById('rev-grid-' + which);
+  gridEl.innerHTML = '';
+
+  run.sequence.forEach((itemId, i) => {
+    const item = itemMap[itemId];
+    const cell = document.createElement('div');
+    cell.className = 'rev-cell ' + item.css;
+    cell.setAttribute('data-pos', i);
+    cell.setAttribute('data-status', run.status[i]);
+    cell.innerHTML = `<div class="rev-badge">${statusIcon(run.status[i])}</div>`;
+    cell.addEventListener('click', () => cycleStatus(which, i, cell));
+    gridEl.appendChild(cell);
+  });
+}
+
+function statusIcon(s) {
+  switch(s) {
+    case 'C': return '✓';
+    case 'E': return '✗';
+    case 'AC': return '⟳';
+    case 'O': return '○';
+    default: return '?';
+  }
+}
+
+const STATUS_CYCLE = ['C', 'E', 'AC', 'O'];
+
+function cycleStatus(which, pos, cell) {
+  const run = S.runs[which];
+  const current = run.status[pos];
+  const nextIdx = (STATUS_CYCLE.indexOf(current) + 1) % STATUS_CYCLE.length;
+  const next = STATUS_CYCLE[nextIdx];
+  run.status[pos] = next;
+  cell.setAttribute('data-status', next);
+  cell.querySelector('.rev-badge').textContent = statusIcon(next);
+}
+
+function buildRevAudio(which) {
+  const run = S.runs[which];
+  const el = document.getElementById('rev-audio-' + which);
+  if (run.audioBlob) {
+    const url = URL.createObjectURL(run.audioBlob);
+    el.innerHTML = `
+      <audio controls src="${url}" style="width:100%;max-width:400px"></audio>
+      <div style="margin-top:6px">
+        <button class="btn btn-ghost btn-sm" onclick="downloadAudio('${which}')">⬇ Descarregar áudio</button>
+      </div>
+      ${run.asrText ? `<div style="margin-top:8px;padding:10px;background:#f8f5f3;border-radius:8px;font-size:.78rem;color:#555;text-align:left">
+        <strong>Transcrição ASR (bruta):</strong><br>${run.asrText}
+      </div>` : ''}`;
+  } else {
+    el.innerHTML = '<div style="font-size:.78rem;color:#999">Áudio não disponível</div>';
+  }
+}
+
+function downloadAudio(which) {
+  const run = S.runs[which];
+  if (!run.audioBlob) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(run.audioBlob);
+  const ext = (run.audioBlob.type || '').includes('webm') ? 'webm' : 'ogg';
+  a.download = `NRC_${which.toUpperCase()}_${S.id}_${S.dt}.${ext}`;
+  a.click();
+  toast('✅ Áudio descarregado');
+}
+
+function skipReview() {
+  // Go directly to results without changing default statuses
+  finishReview();
+}
+
+function finishReview() {
+  showResults();
+}
+
+/* ══════════════════════════════════════════════════════
+   RESULTS
+══════════════════════════════════════════════════════ */
+function showResults() {
+  go('sr');
+
+  const y = Math.floor(S.am / 12), m = S.am % 12;
+  const ageStr = y + ';' + m;
+
+  document.getElementById('r-meta').textContent = S.dt + ' · ' + S.ex;
+  document.getElementById('r-av').textContent = S.id.slice(0, 2).toUpperCase();
+  document.getElementById('r-name').textContent = S.id;
+  document.getElementById('r-childmeta').textContent = `DOB: ${S.dob} · ${S.sex || '—'} · ${S.sch}${S.plnm ? ' · PLNM' : ''}`;
+  document.getElementById('r-agestr').textContent = ageStr;
+
+  let html = '';
+  let audioHtml = '';
+
+  ['cores', 'animais'].forEach(which => {
+    const run = S.runs[which];
+    if (!run) return;
+
+    const label = which === 'cores' ? '🎨 NRC_CORES' : '🐾 NRC_ANIMAIS';
+    const timeSec = (run.timeMs / 1000).toFixed(1);
+    const erros = run.status.filter(s => s === 'E').length;
+    const autocorr = run.status.filter(s => s === 'AC').length;
+    const omissoes = run.status.filter(s => s === 'O').length;
+    const corretos = run.status.filter(s => s === 'C').length;
+
+    html += `
+    <div class="r-subtask-card">
+      <h3>${label}</h3>
+      <div class="r-metric-row">
+        <div class="r-metric">
+          <div class="rv" style="color:var(--dark)">${timeSec}s</div>
+          <div class="rl">Tempo total</div>
+        </div>
+        <div class="r-metric">
+          <div class="rv" style="color:#c0392b">${erros}</div>
+          <div class="rl">Erros</div>
+        </div>
+        <div class="r-metric">
+          <div class="rv" style="color:#e67e22">${autocorr}</div>
+          <div class="rl">Autocorreções</div>
+        </div>
+        <div class="r-metric">
+          <div class="rv" style="color:#7f8c8d">${omissoes}</div>
+          <div class="rl">Omissões</div>
+        </div>
+      </div>
+      <div style="font-size:.78rem;color:var(--muted);line-height:1.6">
+        Corretos: ${corretos}/50 · Taxa: ${Math.round(corretos/50*100)}%
+      </div>
+      ${run.asrText ? `<div style="margin-top:8px;padding:10px;background:#f8f5f3;border-radius:8px;font-size:.75rem;color:#666">
+        <strong>ASR:</strong> ${run.asrText}
+      </div>` : ''}
+    </div>`;
+
+    if (run.audioBlob) {
+      const url = URL.createObjectURL(run.audioBlob);
+      audioHtml += `
+      <div style="margin-bottom:12px;padding:14px;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
+        <div style="font-size:.78rem;font-weight:700;color:var(--dark);margin-bottom:8px">${label} — Áudio</div>
+        <audio controls src="${url}" style="width:100%"></audio>
+        <div style="margin-top:6px;text-align:center">
+          <button class="btn btn-ghost btn-sm" onclick="downloadAudio('${which}')">⬇ Descarregar</button>
+        </div>
+      </div>`;
+    }
+  });
+
+  document.getElementById('r-subtasks').innerHTML = html;
+  document.getElementById('r-audio-downloads').innerHTML = audioHtml;
+
+  // Send to Sheets
+  sendToSheets();
+}
+
+/* ══════════════════════════════════════════════════════
+   GOOGLE SHEETS
+══════════════════════════════════════════════════════ */
+function sendToSheets() {
+  if (!SHEETS_URL) return;
+  const ss = document.getElementById('sync-status');
+  ss.innerHTML = '<span class="sync-badge wait">⏳ A guardar…</span>';
+
+  // Send one row per subtask
+  const payloads = [];
+
+  ['cores', 'animais'].forEach(which => {
+    const run = S.runs[which];
+    if (!run) return;
+
+    const itemCols = {};
+    run.status.forEach((st, i) => {
+      itemCols[`NRC_P${String(i+1).padStart(2,'0')}`] = st;
+    });
+
+    payloads.push({
+      timestamp: new Date().toISOString(),
+      session_id: S.sessionId,
+      modulo: MODULE_CODE,
+      versao: MODULE_VERSION,
+      subtarefa: which === 'cores' ? 'NRC_CORES' : 'NRC_ANIMAIS',
+      ID: S.id,
+      DN: S.dob,
+      IDD: S.am,
+      GEN: S.sex,
+      ESCOLA: S.sch,
+      PLNM: S.plnm ? 'Sim' : 'Não',
+      tecnico: S.ex,
+      data_sessao: S.dt,
+      NRC_sequencia: JSON.stringify(run.sequence),
+      NRC_tempo_s: +(run.timeMs / 1000).toFixed(1),
+      NRC_erros: run.status.filter(s => s === 'E').length,
+      NRC_autocorrecoes: run.status.filter(s => s === 'AC').length,
+      NRC_omissoes: run.status.filter(s => s === 'O').length,
+      NRC_asr_transcript: run.asrText || '',
+      ...itemCols,
+      observacoes: S.nt
+    });
+  });
+
+  let sent = 0;
+  payloads.forEach(payload => {
+    fetch(SHEETS_URL, { method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify(payload) })
+    .then(() => {
+      sent++;
+      if (sent === payloads.length) ss.innerHTML = '<span class="sync-badge ok">✅ Guardado</span>';
+    })
+    .catch(() => { ss.innerHTML = '<span class="sync-badge fail">❌ Falhou — use CSV</span>'; });
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   EXPORTS
+══════════════════════════════════════════════════════ */
+function buildNEXTHIEJson() {
+  const subtaskData = {};
+  ['cores', 'animais'].forEach(which => {
+    const run = S.runs[which];
+    if (!run) return;
+    subtaskData[which === 'cores' ? 'NRC_CORES' : 'NRC_ANIMAIS'] = {
+      sequence: run.sequence,
+      grid: { cols: GRID_COLS, rows: GRID_ROWS },
+      status: run.status,
+      time_ms: run.timeMs,
+      asr_transcript: run.asrText || '',
+      started_at: run.startedAt,
+      completed_at: run.completedAt,
+      summary: {
+        total_items: ITEMS_PER_GRID,
+        correct: run.status.filter(s => s === 'C').length,
+        errors: run.status.filter(s => s === 'E').length,
+        self_corrections: run.status.filter(s => s === 'AC').length,
+        omissions: run.status.filter(s => s === 'O').length,
+      }
+    };
+  });
+
+  return {
+    session: {
+      session_id: S.sessionId,
+      child_id: S.id,
+      child_dob: S.dob,
+      child_age_months: S.am,
+      child_sex: S.sex,
+      school: S.sch,
+      plnm: S.plnm,
+      module_code: MODULE_CODE,
+      module_version: MODULE_VERSION,
+      response_type: 'AUDIO_CAPTURE',
+      administrator: S.ex,
+      session_date: S.dt,
+      notes: S.nt,
+      environment: 'pilot',
+      device: {
+        type: screen.width <= 768 ? (screen.width <= 480 ? 'mobile' : 'tablet') : 'desktop',
+        os: navigator.platform,
+        screen_width: screen.width,
+        screen_height: screen.height,
+        user_agent: navigator.userAgent
+      },
+    },
+    subtasks: subtaskData,
+  };
+}
+
+function doJSON() {
+  const json = buildNEXTHIEJson();
+  const blob = new Blob([JSON.stringify(json, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = MODULE_CODE + '_' + S.id + '_' + S.dt + '.json';
+  a.click();
+  toast('✅ JSON exportado');
+}
+
+function doCSV() {
+  let out = '';
+  ['cores', 'animais'].forEach(which => {
+    const run = S.runs[which];
+    if (!run) return;
+    const label = which === 'cores' ? 'NRC_CORES' : 'NRC_ANIMAIS';
+    out += `# ${label}\n`;
+    out += 'Pos,Estimulo,Status\n';
+    run.sequence.forEach((itemId, i) => {
+      out += `${i+1},${itemId},${run.status[i]}\n`;
+    });
+    out += `\nTempo_s,${(run.timeMs/1000).toFixed(1)}\n`;
+    out += `Erros,${run.status.filter(s=>s==='E').length}\n`;
+    out += `Autocorrecoes,${run.status.filter(s=>s==='AC').length}\n`;
+    out += `Omissoes,${run.status.filter(s=>s==='O').length}\n`;
+    out += `ASR,"${(run.asrText||'').replace(/"/g,'""')}"\n\n`;
+  });
+
+  out += `# Sessao\nModulo,${MODULE_CODE}\nVersao,${MODULE_VERSION}\nSession_ID,${S.sessionId}\nID,${S.id}\nDN,${S.dob}\nIDD,${S.am}\nGEN,${S.sex}\nESCOLA,${S.sch}\nPLNM,${S.plnm?'Sim':'Não'}\nTecnico,${S.ex}\nData,${S.dt}\n`;
+  if (S.nt) out += `Obs,"${S.nt}"\n`;
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([out], { type:'text/csv;charset=utf-8;' }));
+  a.download = MODULE_CODE + '_' + S.id + '_' + S.dt + '.csv';
+  a.click();
+  toast('✅ CSV exportado');
+}
+
+/* ══════════════════════════════════════════════════════
+   NEW SESSION
+══════════════════════════════════════════════════════ */
+function newSession() {
+  // Release any audio
+  if (audioStream) {
+    audioStream.getTracks().forEach(t => t.stop());
+    audioStream = null;
+  }
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  if (recTimerInterval) clearInterval(recTimerInterval);
+
+  S = { id:'',dob:'',sex:'',sch:'',ex:'',dt:'',nt:'',plnm:false,am:0,sessionId:'',
+        subtasks:{cores:true,animais:true}, runs:{} };
+  currentRun = null;
+  runState = null;
+  mediaRecorder = null;
+  audioChunks = [];
+  recStartTime = null;
+
+  ['fid','fdob','fsx','fsch','fex','fnt'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+  document.getElementById('adsp').textContent = '—';
+  document.getElementById('fdt').value = new Date().toISOString().slice(0,10);
+  document.getElementById('opt-cores').classList.add('active');
+  document.getElementById('opt-animais').classList.add('active');
+  S.subtasks = {cores:true, animais:true};
+  renderChildPicker();
+  go('sw');
+}
+
+/* ══════════════════════════════════════════════════════
+   CHILD REGISTRY (localStorage persistence)
+══════════════════════════════════════════════════════ */
+function getChildren() {
+  try { return JSON.parse(localStorage.getItem('nexthie_children') || '[]'); }
+  catch { return []; }
+}
+function saveChild(child) {
+  const list = getChildren();
+  const idx = list.findIndex(c => c.id === child.id);
+  if (idx >= 0) list[idx] = child; else list.push(child);
+  localStorage.setItem('nexthie_children', JSON.stringify(list));
+}
+function fillChildFields(child) {
+  document.getElementById('fid').value = child.id;
+  document.getElementById('fdob').value = child.dob;
+  document.getElementById('fsx').value = child.sex || '';
+  document.getElementById('fsch').value = child.sch || '';
+  const cb = document.getElementById('fplnm'); if (cb) cb.checked = child.plnm || false;
+  calcAge();
+}
+function renderChildPicker() {
+  const list = getChildren();
+  const el = document.getElementById('child-picker');
+  if (list.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div style="padding:10px 14px;background:#f0faf8;border:1.5px solid var(--caidi);border-radius:9px;margin-bottom:8px">
+      <div style="font-size:.72rem;font-weight:700;color:var(--caidi);margin-bottom:6px">Crianças registadas (${list.length})</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${list.map(c => `<button class="btn btn-sm" onclick="fillChildFields(${JSON.stringify(c).replace(/"/g,'&quot;')})" style="background:var(--caidi);color:#fff;padding:5px 12px;font-size:.78rem">${c.id}</button>`).join('')}
+      </div>
+      <div style="font-size:.65rem;color:#888;margin-top:4px">Toca num código para preencher automaticamente</div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════════
+   SHEETS TEST
+══════════════════════════════════════════════════════ */
+function updateSheetsStatus() {
+  const el = document.getElementById('sheets-status');
+  const btn = document.getElementById('btn-test-sheets');
+  if (SHEETS_URL) {
+    el.innerHTML = '<span style="color:#2e8b57;font-weight:600">✅ URL configurado</span>';
+    btn.style.display = '';
+  } else {
+    el.innerHTML = '<span style="color:#c04040;font-weight:600">⚠ Sem URL configurado</span><span style="font-size:.72rem;color:#999"> — os dados só ficam no CSV/JSON/áudio.</span>';
+    btn.style.display = 'none';
+  }
+}
+function testSheets() {
+  if (!SHEETS_URL) { toast('⚠ Sem URL configurado'); return; }
+  const el = document.getElementById('sheets-status');
+  el.innerHTML = '<span style="color:#b07d00;font-weight:600">⏳ A testar…</span>';
+  fetch(SHEETS_URL, { method:'POST', mode:'no-cors',
+    headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({ tipo:'teste_ligacao', modulo:MODULE_CODE, timestamp:new Date().toISOString(), teste:true }) })
+  .then(() => {
+    el.innerHTML = '<span style="color:#2e8b57;font-weight:600">✅ Ligação OK</span><span style="font-size:.72rem;color:#888"> — verifica se apareceu uma linha de teste na Sheet</span>';
+    toast('✅ Teste enviado');
+  })
+  .catch(() => {
+    el.innerHTML = '<span style="color:#c04040;font-weight:600">❌ Falhou</span>';
+    toast('❌ Teste falhou');
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════ */
+document.getElementById('fdt').value = new Date().toISOString().slice(0,10);
+renderChildPicker();
+updateSheetsStatus();
+</script>
+</body>
+</html>
