@@ -271,7 +271,7 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
   <div class="w-cta-block">
     <p>Módulo de rastreio digital para identificação de letras pelo nome. A criança ouve o nome de uma letra e seleciona a letra correta entre 4 opções.</p>
     <div class="w-cta">
-      <button class="btn btn-main btn-lg" onclick="go('ss')">Iniciar sessão</button>
+      <button class="btn btn-main btn-lg" onclick="isAdmin ? go('ss') : showInstructions()">Iniciar sessão</button>
     </div>
   </div>
 
@@ -1433,7 +1433,7 @@ if (isAdmin) {
   // ── ADMIN MODE: show welcome/setup (for technicians) ──
   go('sw');
 } else {
-  // ── CHILD MODE (default): straight to game ──
+  // ── CHILD MODE: load child profile and show welcome screen first ──
   const dt = new Date().toISOString().slice(0, 10);
 
   // Load active child from localStorage (pilot) or platform (production)
@@ -1461,7 +1461,7 @@ if (isAdmin) {
   S.blocked = false;
   S.playMode = true;
 
-  showInstructions();
+  go('sw');
 }
 </script>
 </body>
