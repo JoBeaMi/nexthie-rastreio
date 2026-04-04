@@ -180,13 +180,25 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
   padding:12px; overflow:auto; min-height:0;
 }
 .ran-grid {
-  display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;
-  max-width:520px; width:100%;
+  display:grid; grid-template-columns:repeat(10, 1fr); gap:5px;
+  width:100%; max-width:none;
 }
 .ran-cell {
-  aspect-ratio:1; border-radius:12px; display:flex; align-items:center; justify-content:center;
+  aspect-ratio:1; border-radius:10px; display:flex; align-items:center; justify-content:center;
   border:3px solid rgba(0,0,0,.08); background:#fff; position:relative;
-  transition:all .15s; font-size:clamp(1.6rem, 4vw, 2.2rem);
+  transition:all .15s; font-size:clamp(1.2rem, 3.5vw, 1.8rem);
+}
+
+/* Force landscape via CSS transform when device is in portrait */
+@media (orientation: portrait) {
+  #sg.on, #sp.on {
+    position: fixed !important;
+    top: 0; left: 100vw;
+    width: 100vh !important; height: 100vw !important;
+    transform-origin: top left;
+    transform: rotate(90deg);
+    overflow: hidden;
+  }
 }
 /* Color cells */
 .ran-cell.c-azul     { background:#2979FF; border-color:#1565C0; }
@@ -305,8 +317,12 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 
 /* Practice grid */
 .practice-grid {
-  display:grid; grid-template-columns:repeat(7,1fr); gap:8px;
-  max-width:460px; width:100%;
+  display:flex; flex-direction:row; gap:8px;
+  overflow-x:auto; width:100%; justify-content:center; padding:4px 0;
+}
+.practice-grid .ran-cell {
+  width:clamp(46px,11vw,72px); height:clamp(46px,11vw,72px);
+  flex-shrink:0; aspect-ratio:unset;
 }
 
 @media (max-width:480px) {
@@ -319,6 +335,32 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
   .scr { display:none !important; }
   #sr { display:flex !important; overflow:visible; height:auto; }
   .r-hdr-r, .s-foot, .grid-controls { display:none; }
+}
+
+/* Review word alignment */
+.rev-item { display:flex; flex-direction:column; gap:2px; }
+.rev-word {
+  font-size:.6rem; font-weight:700; text-align:center;
+  background:rgba(255,255,255,.85); border-radius:4px; padding:2px 3px;
+  border:none; width:100%; color:#333; cursor:text;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  font-family:inherit;
+}
+.rev-word:focus { outline:2px solid var(--rosa); background:#fff; }
+.rev-word.mismatch { background:#fff0f0; color:#c0392b; }
+.rev-ctrl-row {
+  display:flex; gap:2px; justify-content:center;
+}
+.rev-ctrl-row button {
+  font-size:.55rem; padding:1px 4px; border-radius:4px; border:none; cursor:pointer;
+  font-weight:900; line-height:1.4; font-family:inherit;
+}
+.btn-ins { background:#e0f0ea; color:#2e8b57; }
+.btn-del { background:#fff0e0; color:#e67e22; }
+.btn-skip-line {
+  grid-column:1/-1; font-size:.6rem; padding:3px 8px;
+  background:#f0e8ff; color:#7c6dd8; border:none; border-radius:6px;
+  cursor:pointer; font-weight:800; font-family:inherit; margin-top:2px;
 }
 </style>
 </head>
@@ -595,15 +637,16 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 
 <div class="toast" id="toast">—</div>
 
+
 <script>
 /* ══════════════════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════════════════ */
-const SHEETS_URL = ''; // ← paste Google Apps Script URL here
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby8hFjd5pEgJDnEcpLjjKjRIWV04ONVM9xk7DGwhDBCllmJF28M3HSYu_GU5qFMpBgp/exec';
 const MODULE_CODE = 'NRC';
 const MODULE_VERSION = '1.0';
-const GRID_COLS = 5;
-const GRID_ROWS = 10;
+const GRID_COLS = 10;
+const GRID_ROWS = 5;
 const ITEMS_PER_GRID = GRID_COLS * GRID_ROWS; // 50
 
 /* ══════════════════════════════════════════════════════
@@ -919,6 +962,7 @@ async function requestMicAndStart() {
 ══════════════════════════════════════════════════════ */
 function showGrid() {
   go('sg');
+  try { screen.orientation.lock('landscape'); } catch(e) {}
   const label = currentRun === 'cores' ? 'NRC_CORES' : 'NRC_ANIMAIS';
   document.getElementById('g-nm').textContent = S.id;
   document.getElementById('g-tk').textContent = label;
@@ -1076,6 +1120,7 @@ function stopRecording() {
    AFTER GRID — next subtask or review
 ══════════════════════════════════════════════════════ */
 function proceedAfterGrid() {
+  try { screen.orientation.unlock(); } catch(e) {}
   // Check if there's a next subtask
   if (currentRun === 'cores' && S.subtasks.animais) {
     // Release and re-acquire mic for next subtask? No, keep the stream
@@ -1084,6 +1129,37 @@ function proceedAfterGrid() {
     // Go to review
     showReview();
   }
+}
+
+/* ══════════════════════════════════════════════════════
+   REVIEW WORD ALIGNMENT HELPERS
+══════════════════════════════════════════════════════ */
+function insertOmission(which, pos) {
+  const run = S.runs[which];
+  run.words.splice(pos, 0, '');
+  run.words = run.words.slice(0, 50);
+  run.status.splice(pos, 0, 'O');
+  run.status = run.status.slice(0, 50);
+  buildRevGrid(which);
+}
+
+function deleteWord(which, pos) {
+  const run = S.runs[which];
+  run.words.splice(pos, 1);
+  run.words.push('');
+  // Don't change status — technician corrects manually
+  buildRevGrid(which);
+}
+
+function insertLineSkip(which, pos) {
+  const COLS = 5;
+  const run = S.runs[which];
+  const blanks = Array(COLS).fill('');
+  run.words.splice(pos, 0, ...blanks);
+  run.words = run.words.slice(0, 50);
+  run.status.splice(pos, 0, ...Array(COLS).fill('O'));
+  run.status = run.status.slice(0, 50);
+  buildRevGrid(which);
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1100,6 +1176,11 @@ function showReview() {
 
   // Build review grids
   if (S.runs.cores) {
+    const run = S.runs.cores;
+    if (!run.words) {
+      const tokens = (run.asrText || '').trim().split(/\s+/).filter(w => w.length > 0);
+      run.words = Array.from({length: 50}, (_, i) => tokens[i] || '');
+    }
     document.getElementById('rev-section-cores').style.display = '';
     buildRevGrid('cores');
     buildRevAudio('cores');
@@ -1108,6 +1189,11 @@ function showReview() {
   }
 
   if (S.runs.animais) {
+    const run = S.runs.animais;
+    if (!run.words) {
+      const tokens = (run.asrText || '').trim().split(/\s+/).filter(w => w.length > 0);
+      run.words = Array.from({length: 50}, (_, i) => tokens[i] || '');
+    }
     document.getElementById('rev-section-animais').style.display = '';
     buildRevGrid('animais');
     buildRevAudio('animais');
@@ -1125,15 +1211,71 @@ function buildRevGrid(which) {
   const gridEl = document.getElementById('rev-grid-' + which);
   gridEl.innerHTML = '';
 
+  const COLS = 5; // review grid is always 5 cols for readability
+
   run.sequence.forEach((itemId, i) => {
+    // Row separator with "skip line" button every COLS items
+    if (i > 0 && i % COLS === 0) {
+      const skipBtn = document.createElement('button');
+      skipBtn.className = 'btn-skip-line';
+      skipBtn.textContent = '⊕ Inserir linha de omissões aqui (×' + COLS + ')';
+      skipBtn.onclick = () => insertLineSkip(which, i);
+      gridEl.appendChild(skipBtn);
+    }
+
     const item = itemMap[itemId];
+    const word = run.words[i] || '';
+    const expected = item.label.toLowerCase();
+    const isMismatch = word.length > 0 && !word.toLowerCase().includes(expected) && !expected.includes(word.toLowerCase());
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'rev-item';
+    wrapper.id = 'rev-item-' + which + '-' + i;
+
+    // Cell (color/animal)
     const cell = document.createElement('div');
     cell.className = 'rev-cell ' + item.css;
     cell.setAttribute('data-pos', i);
     cell.setAttribute('data-status', run.status[i]);
     cell.innerHTML = `<div class="rev-badge">${statusIcon(run.status[i])}</div>`;
     cell.addEventListener('click', () => cycleStatus(which, i, cell));
-    gridEl.appendChild(cell);
+
+    // Word input
+    const wordInput = document.createElement('input');
+    wordInput.className = 'rev-word' + (isMismatch ? ' mismatch' : '');
+    wordInput.value = word;
+    wordInput.title = 'Editar palavra transcrita';
+    wordInput.addEventListener('input', () => {
+      run.words[i] = wordInput.value;
+      const exp = item.label.toLowerCase();
+      const w = wordInput.value.toLowerCase();
+      const mm = w.length > 0 && !w.includes(exp) && !exp.includes(w);
+      wordInput.classList.toggle('mismatch', mm);
+    });
+
+    // Controls: insert omission before, delete word (self-correction)
+    const ctrlRow = document.createElement('div');
+    ctrlRow.className = 'rev-ctrl-row';
+
+    const insBtn = document.createElement('button');
+    insBtn.className = 'btn-ins';
+    insBtn.textContent = '＋';
+    insBtn.title = 'Inserir omissão antes desta posição';
+    insBtn.onclick = () => insertOmission(which, i);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-del';
+    delBtn.textContent = '－';
+    delBtn.title = 'Eliminar palavra (autocorreção extra)';
+    delBtn.onclick = () => deleteWord(which, i);
+
+    ctrlRow.appendChild(insBtn);
+    ctrlRow.appendChild(delBtn);
+
+    wrapper.appendChild(cell);
+    wrapper.appendChild(wordInput);
+    wrapper.appendChild(ctrlRow);
+    gridEl.appendChild(wrapper);
   });
 }
 
@@ -1327,6 +1469,7 @@ function sendToSheets() {
       NRC_autocorrecoes: run.status.filter(s => s === 'AC').length,
       NRC_omissoes: run.status.filter(s => s === 'O').length,
       NRC_asr_transcript: run.asrText || '',
+      NRC_asr_alinhado: run.words ? run.words.join(' ') : '',
       ...itemCols,
       observacoes: S.nt
     });
@@ -1359,6 +1502,7 @@ function buildNEXTHIEJson() {
       status: run.status,
       time_ms: run.timeMs,
       asr_transcript: run.asrText || '',
+      asr_aligned_words: run.words || [],
       started_at: run.startedAt,
       completed_at: run.completedAt,
       summary: {
@@ -1416,9 +1560,10 @@ function doCSV() {
     if (!run) return;
     const label = which === 'cores' ? 'NRC_CORES' : 'NRC_ANIMAIS';
     out += `# ${label}\n`;
-    out += 'Pos,Estimulo,Status\n';
+    out += 'Pos,Estimulo,Status,Transcricao\n';
     run.sequence.forEach((itemId, i) => {
-      out += `${i+1},${itemId},${run.status[i]}\n`;
+      const word = run.words ? (run.words[i] || '') : '';
+      out += `${i+1},${itemId},${run.status[i]},"${word}"\n`;
     });
     out += `\nTempo_s,${(run.timeMs/1000).toFixed(1)}\n`;
     out += `Erros,${run.status.filter(s=>s==='E').length}\n`;
