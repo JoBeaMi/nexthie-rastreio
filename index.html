@@ -12,7 +12,7 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden}
 
 /* Fantasy background image */
 body{
-  background-image:url(assets/bg.jpg);
+  background-image:url(assets/bg-world.jpg);
   background-size:cover;
   background-position:center bottom;
   background-repeat:no-repeat;
@@ -45,7 +45,7 @@ body{
 .path-track{position:absolute;bottom:26%;left:60px;right:60px;height:10px;border-radius:5px;background:rgba(255,255,255,.25);z-index:1}
 .path-fill{height:100%;border-radius:5px;background:rgba(255,255,255,.6);transition:width 1s ease}
 
-/* Mascot sprite */
+/* Mascot sprite — sheet is 1024×1536, 3×3 cells each 341×512 (2:3 ratio) */
 .mascot-on-node{
   position:absolute;z-index:10;pointer-events:none;
   transition:all 1s cubic-bezier(.34,1.56,.64,1);
@@ -56,16 +56,15 @@ body{
 @keyframes tb{0%{transform:translateY(0) scale(1)}100%{transform:translateY(-3px) scale(1.03)}}
 
 .mascot-sprite{
-  width:90px;height:90px;
+  width:70px;height:105px; /* 2:3 ratio = one sprite cell */
   background-image:url(assets/mascot.png);
   background-size:300% 300%;
-  background-position:0% 0%; /* idle: top-left cell */
+  background-position:0% 0%; /* idle: row0 col0 */
   background-repeat:no-repeat;
   filter:drop-shadow(0 4px 14px rgba(0,160,144,.3));
-  image-rendering:auto;
 }
-/* Talking pose: top-center cell of sprite */
-.world.talking .mascot-sprite{background-position:50% 0%}
+/* Talking pose: row1 col1 (arms out / happy) */
+.world.talking .mascot-sprite{background-position:50% 50%}
 
 /* Nodes */
 .nodes{
@@ -80,27 +79,29 @@ body{
   overflow:hidden;
 }
 
-/* Icon sprite inside each node */
+/* Icon sprite — 1024×1536, 3×3 cells each 341×512 (2:3 ratio)
+   Actual icons:
+   Row 0: ABC-Letras(0,0) | Brain-Código(1,0)   | Crystal-Rápido(2,0)
+   Row 1: CAO-Nomeação(0,1)| Book-Frases(1,1)   | Puzzle-Parecidos(2,1)
+   Row 2: Lock(0,2)        | Star(1,2)           | Flag-Palavras(2,2)   */
 .gn-ico{
-  width:64%;height:64%;
+  /* 2:3 ratio cell, sized to fill ~65% of circle width */
+  width:56%;
+  height:calc(56% * 512 / 341); /* ≈84% — preserves 2:3 */
   background-image:url(assets/icons.png);
   background-size:300% 300%;
   background-repeat:no-repeat;
   background-position:0% 0%;
 }
-/* Icon positions in the 3×3 sprite (col/row):
-   Row 0: letras(0,0) | nomeacao(1,0) | codigo(2,0)
-   Row 1: frases(0,1) | parecidos(1,1) | rapido(2,1)
-   Row 2: palavras(0,2)| star(1,2)     | lock(2,2)   */
 .gn-ico[data-icon="letras"]    {background-position:0%   0%}
-.gn-ico[data-icon="nomeacao"]  {background-position:50%  0%}
-.gn-ico[data-icon="codigo"]    {background-position:100% 0%}
-.gn-ico[data-icon="frases"]    {background-position:0%   50%}
-.gn-ico[data-icon="parecidos"] {background-position:50%  50%}
-.gn-ico[data-icon="rapido"]    {background-position:100% 50%}
-.gn-ico[data-icon="palavras"]  {background-position:0%   100%}
+.gn-ico[data-icon="codigo"]    {background-position:50%  0%}
+.gn-ico[data-icon="rapido"]    {background-position:100% 0%}
+.gn-ico[data-icon="nomeacao"]  {background-position:0%   50%}
+.gn-ico[data-icon="frases"]    {background-position:50%  50%}
+.gn-ico[data-icon="parecidos"] {background-position:100% 50%}
+.gn-ico[data-icon="lock"]      {background-position:0%   100%}
 .gn-ico[data-icon="star"]      {background-position:50%  100%}
-.gn-ico[data-icon="lock"]      {background-position:100% 100%}
+.gn-ico[data-icon="palavras"]  {background-position:100% 100%}
 
 .gn-name{
   font-size:clamp(.8rem,2.2vw,.95rem);font-weight:900;color:#fff;
@@ -158,14 +159,12 @@ body{
   cursor:pointer;transition:opacity .5s;
 }
 .tap-mascot{
-  width:120px;height:120px;
+  width:100px;height:150px; /* 2:3 ratio */
   background-image:url(assets/mascot.png);
   background-size:300% 300%;
-  background-position:0% 0%;
+  background-position:100% 100%; /* celebrating pose: row2 col2 */
   background-repeat:no-repeat;
-  animation:gpulse 2s ease-in-out infinite;
   filter:drop-shadow(0 6px 16px rgba(0,160,144,.35));
-  --glow:rgba(0,160,144,.3);--glow2:rgba(0,160,144,.1);
 }
 .tap-ov h2{font-size:1.4rem;font-weight:900;color:#0a4a40;margin-top:18px}
 .tap-ov p{font-size:.85rem;color:rgba(10,74,64,.45);margin-top:4px}
@@ -236,7 +235,7 @@ body{
 
         <div class="gn locked" id="gn-2">
           <div class="gn-circle" style="background:linear-gradient(145deg,#A08AEE,#7C6DD8)">
-            <div class="gn-ico" data-icon="codigo"></div>
+            <div class="gn-ico" data-icon="lock"></div>
             <div class="gn-lock">🔒</div>
           </div>
           <span class="gn-name">Código</span>
@@ -244,7 +243,7 @@ body{
 
         <div class="gn locked" id="gn-3">
           <div class="gn-circle" style="background:linear-gradient(145deg,#6AABEF,#4A90D9)">
-            <div class="gn-ico" data-icon="frases"></div>
+            <div class="gn-ico" data-icon="lock"></div>
             <div class="gn-lock">🔒</div>
           </div>
           <span class="gn-name">Frases</span>
@@ -252,7 +251,7 @@ body{
 
         <div class="gn locked" id="gn-4">
           <div class="gn-circle" style="background:linear-gradient(145deg,#7DD87D,#5CB85C)">
-            <div class="gn-ico" data-icon="parecidos"></div>
+            <div class="gn-ico" data-icon="lock"></div>
             <div class="gn-lock">🔒</div>
           </div>
           <span class="gn-name">Parecidos</span>
@@ -260,7 +259,7 @@ body{
 
         <div class="gn locked" id="gn-5">
           <div class="gn-circle" style="background:linear-gradient(145deg,#F080A8,#D4537E)">
-            <div class="gn-ico" data-icon="rapido"></div>
+            <div class="gn-ico" data-icon="lock"></div>
             <div class="gn-lock">🔒</div>
           </div>
           <span class="gn-name">Rápido</span>
@@ -268,7 +267,7 @@ body{
 
         <div class="gn locked" id="gn-6">
           <div class="gn-circle" style="background:linear-gradient(145deg,#F0A050,#E67E22)">
-            <div class="gn-ico" data-icon="palavras"></div>
+            <div class="gn-ico" data-icon="lock"></div>
             <div class="gn-lock">🔒</div>
           </div>
           <span class="gn-name">Palavras</span>
@@ -313,7 +312,7 @@ function posMascot(){
   const circle=active.querySelector('.gn-circle');
   const r=circle.getBoundingClientRect();
   const land=document.getElementById('land').getBoundingClientRect();
-  m.style.left=(r.left-land.left+r.width/2-45)+'px';
+  m.style.left=(r.left-land.left+r.width/2-35)+'px';
   m.style.bottom=(land.bottom-r.top+10)+'px';
 }
 setTimeout(posMascot,150);
