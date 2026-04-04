@@ -1066,8 +1066,13 @@ function finish() {
   // Send to Sheets always
   sendToSheets(correct, total, meanRt, dur, errLetters);
 
-  // Child mode: skip report, go straight back to hub
+  // Child mode: skip report, mark done, go straight back to hub
   if (!isAdmin) {
+    try {
+      const done = JSON.parse(localStorage.getItem('nexthie_done') || '[]');
+      if (!done.includes('LETRAS_ID')) done.push('LETRAS_ID');
+      localStorage.setItem('nexthie_done', JSON.stringify(done));
+    } catch(e) {}
     setTimeout(() => window.location.href = 'index.html', 400);
     return;
   }

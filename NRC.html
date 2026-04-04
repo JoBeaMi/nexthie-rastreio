@@ -319,7 +319,7 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 <body>
 
 <!-- ══════ WELCOME ══════ -->
-<div id="sw" class="scr on">
+<div id="sw" class="scr">
  <div class="w-inner">
   <div class="w-hero">
     <div class="w-instrument-tag">NEXTHIE · Rastreio Digital</div>
@@ -1133,6 +1133,21 @@ function finishReview() {
    RESULTS
 ══════════════════════════════════════════════════════ */
 function showResults() {
+  // Send to Sheets always
+  sendToSheets();
+
+  // Child mode: skip report, mark done, go straight back to hub
+  if (!isAdmin) {
+    try {
+      const done = JSON.parse(localStorage.getItem('nexthie_done') || '[]');
+      if (!done.includes('NRC')) done.push('NRC');
+      localStorage.setItem('nexthie_done', JSON.stringify(done));
+    } catch(e) {}
+    setTimeout(() => window.location.href = 'index.html', 400);
+    return;
+  }
+
+  // Admin mode: show full results screen
   go('sr');
 
   const y = Math.floor(S.am / 12), m = S.am % 12;
@@ -1202,9 +1217,6 @@ function showResults() {
 
   document.getElementById('r-subtasks').innerHTML = html;
   document.getElementById('r-audio-downloads').innerHTML = audioHtml;
-
-  // Send to Sheets
-  sendToSheets();
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1459,6 +1471,34 @@ function testSheets() {
 document.getElementById('fdt').value = new Date().toISOString().slice(0,10);
 renderChildPicker();
 updateSheetsStatus();
+
+const params = new URLSearchParams(window.location.search);
+const isAdmin = params.get('admin') === '1';
+
+if (isAdmin) {
+  go('sw');
+} else {
+  // Child mode: load active child and go straight to instructions
+  const dt = new Date().toISOString().slice(0, 10);
+  try {
+    const child = JSON.parse(localStorage.getItem('nexthie_active_child'));
+    if (child && child.id) {
+      const d1 = new Date(child.dob), d2 = new Date(dt);
+      S.id = child.id;
+      S.dob = child.dob || '';
+      S.sex = child.sex || '';
+      S.sch = child.sch || '';
+      S.ex = child.tech || '';
+      S.plnm = child.plnm || false;
+      S.am = child.dob ? (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth()) : 0;
+    }
+  } catch(e) {}
+  S.dt = dt;
+  S.sessionId = 'NRC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 5).toUpperCase();
+  S.runs = {};
+  S.subtasks = { cores: true, animais: true };
+  go('si');
+}
 </script>
 </body>
 </html>

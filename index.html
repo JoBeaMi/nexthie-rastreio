@@ -209,7 +209,10 @@ body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
           <div class="gn-circle" style="background:linear-gradient(145deg,#FF8A9E,#E85D75)"><span class="ico">🔤</span><div class="badge">JOGAR!</div></div>
           <span class="gn-name">Letras</span>
         </a>
-        <div class="gn locked" id="gn-1"><div class="gn-circle" style="background:linear-gradient(145deg,#FFC85A,#F5A623)"><span class="ico">🧠</span><div class="gn-lock">🔒</div></div><span class="gn-name">Memória</span></div>
+        <a href="NRC.html" class="gn locked" id="gn-1" style="--glow:rgba(245,166,35,.35);--glow2:rgba(245,166,35,.12);--gc:#F5A623;text-decoration:none">
+          <div class="gn-circle" style="background:linear-gradient(145deg,#FFC85A,#F5A623)"><span class="ico">⚡</span><div class="badge">JOGAR!</div><div class="gn-lock">🔒</div></div>
+          <span class="gn-name">Nomeação</span>
+        </a>
         <div class="gn locked" id="gn-2"><div class="gn-circle" style="background:linear-gradient(145deg,#A08AEE,#7C6DD8)"><span class="ico">🔮</span><div class="gn-lock">🔒</div></div><span class="gn-name">Código</span></div>
         <div class="gn locked" id="gn-3"><div class="gn-circle" style="background:linear-gradient(145deg,#6AABEF,#4A90D9)"><span class="ico">🖼️</span><div class="gn-lock">🔒</div></div><span class="gn-name">Frases</span></div>
         <div class="gn locked" id="gn-4"><div class="gn-circle" style="background:linear-gradient(145deg,#7DD87D,#5CB85C)"><span class="ico">🪢</span><div class="gn-lock">🔒</div></div><span class="gn-name">Parecidos</span></div>
@@ -256,7 +259,7 @@ function posMascot(){
   m.style.left=(r.left-land.left+r.width/2-40)+'px';
   m.style.bottom=(land.bottom-r.top+10)+'px';
 }
-setTimeout(posMascot,100);
+setTimeout(posMascot,150);
 window.addEventListener('resize',posMascot);
 document.getElementById('scroll').addEventListener('scroll',posMascot);
 
@@ -284,6 +287,37 @@ function playWelcome(){
 }
 function dn(t,w,sp){clearInterval(t);w.classList.remove('talking');sp.textContent='Toca num jogo! 👆';setTimeout(()=>sp.classList.remove('on'),4000)}
 if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=()=>{};
+
+// Progress: unlock nodes based on completed activities
+(function(){
+  const SEQUENCE = [
+    { id:'gn-0', code:'LETRAS_ID' },
+    { id:'gn-1', code:'NRC'      },
+  ];
+  try {
+    const done = JSON.parse(localStorage.getItem('nexthie_done') || '[]');
+    SEQUENCE.forEach((act, i) => {
+      const el = document.getElementById(act.id);
+      if (!el) return;
+      const isDone = done.includes(act.code);
+      const prevDone = i === 0 || done.includes(SEQUENCE[i-1].code);
+      if (isDone) {
+        // completed: show as done, not active
+        el.classList.remove('active','locked');
+        el.classList.add('done');
+        el.querySelector('.badge')?.remove();
+        el.querySelector('.gn-lock')?.remove();
+        const circle = el.querySelector('.gn-circle');
+        if (circle) circle.style.opacity = '0.55';
+      } else if (prevDone) {
+        // next up: unlock and make active
+        el.classList.remove('locked');
+        el.classList.add('active');
+        el.querySelector('.gn-lock')?.remove();
+      }
+    });
+  } catch(e) {}
+})();
 
 // Child
 function saveC(){const id=document.getElementById('tc-id').value.trim(),dob=document.getElementById('tc-dob').value;if(!id||!dob){alert('Código e data de nascimento.');return}localStorage.setItem('nexthie_active_child',JSON.stringify({id,dob,sex:document.getElementById('tc-sex').value,sch:document.getElementById('tc-sch').value.trim(),tech:document.getElementById('tc-tech').value.trim(),plnm:document.getElementById('tc-plnm').checked}));loadC();alert('Criança ativada: '+id)}
