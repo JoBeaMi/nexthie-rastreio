@@ -1217,7 +1217,7 @@ function sendToSheets(correct, total, meanRt, dur, errLetters) {
     observacoes: S.nt
   };
 
-  fetch(SHEETS_URL, { method: 'POST', mode: 'no-cors',
+  fetch(SHEETS_URL, { method: 'POST', mode: 'no-cors', keepalive: true,
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload) })
   .then(() => { ss.innerHTML = '<span class="sync-badge ok">✅ Guardado</span>'; })

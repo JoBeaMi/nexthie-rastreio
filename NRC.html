@@ -844,6 +844,7 @@ function prepareSubtask(which) {
     audioBlob: null,
     asrText: '',
     asrInterim: '',
+    asrEvents: [],   // [{text, t_ms}] — timestamp of each final ASR event from recording start
     timeMs: 0,
     startedAt: null,
     completedAt: null,
@@ -1033,7 +1034,13 @@ function startRecordingFull() {
             interim += event.results[i][0].transcript;
           }
         }
-        if (final) runState.asrText += final;
+        if (final) {
+          runState.asrText += final;
+          runState.asrEvents.push({
+            text: final.trim(),
+            t_ms: Date.now() - recStartTime
+          });
+        }
         runState.asrInterim = interim;
         document.getElementById('asr-live').textContent = interim || '…';
       };
@@ -1101,6 +1108,7 @@ function stopRecording() {
     status: [...runState.status],
     timeMs: runState.timeMs,
     asrText: (runState.asrText + runState.asrInterim).trim(),
+    asrEvents: [...runState.asrEvents],
     audioBlob: runState.audioBlob, // will be set after onstop fires
     startedAt: runState.startedAt,
     completedAt: runState.completedAt,
@@ -1137,7 +1145,7 @@ function proceedAfterGrid() {
 function insertOmission(which, pos) {
   const run = S.runs[which];
   run.words.splice(pos, 0, '');
-  run.words = run.words.slice(0, 50);
+  // Don't cut run.words — keeps overflow accessible
   run.status.splice(pos, 0, 'O');
   run.status = run.status.slice(0, 50);
   buildRevGrid(which);
@@ -1146,8 +1154,8 @@ function insertOmission(which, pos) {
 function deleteWord(which, pos) {
   const run = S.runs[which];
   run.words.splice(pos, 1);
-  run.words.push('');
-  // Don't change status — technician corrects manually
+  // Only pad if we've gone below 50 — otherwise overflow words fill in naturally
+  if (run.words.length < 50) run.words.push('');
   buildRevGrid(which);
 }
 
@@ -1156,7 +1164,7 @@ function insertLineSkip(which, pos) {
   const run = S.runs[which];
   const blanks = Array(COLS).fill('');
   run.words.splice(pos, 0, ...blanks);
-  run.words = run.words.slice(0, 50);
+  // Don't cut run.words — keeps overflow accessible
   run.status.splice(pos, 0, ...Array(COLS).fill('O'));
   run.status = run.status.slice(0, 50);
   buildRevGrid(which);
@@ -1179,7 +1187,8 @@ function showReview() {
     const run = S.runs.cores;
     if (!run.words) {
       const tokens = (run.asrText || '').trim().split(/\s+/).filter(w => w.length > 0);
-      run.words = Array.from({length: 50}, (_, i) => tokens[i] || '');
+      // Keep ALL words — don't cut at 50 so overflow words stay accessible
+      run.words = tokens.length >= 50 ? tokens : [...tokens, ...Array(50 - tokens.length).fill('')];
     }
     document.getElementById('rev-section-cores').style.display = '';
     buildRevGrid('cores');
@@ -1192,7 +1201,8 @@ function showReview() {
     const run = S.runs.animais;
     if (!run.words) {
       const tokens = (run.asrText || '').trim().split(/\s+/).filter(w => w.length > 0);
-      run.words = Array.from({length: 50}, (_, i) => tokens[i] || '');
+      // Keep ALL words — don't cut at 50 so overflow words stay accessible
+      run.words = tokens.length >= 50 ? tokens : [...tokens, ...Array(50 - tokens.length).fill('')];
     }
     document.getElementById('rev-section-animais').style.display = '';
     buildRevGrid('animais');
@@ -1205,6 +1215,13 @@ function showReview() {
 function buildRevGrid(which) {
   const run = S.runs[which];
   const items = which === 'cores' ? CORES : ANIMAIS;
+
+  // Build word-level timestamp map from asrEvents
+  const wordTs = [];
+  (run.asrEvents || []).forEach(ev => {
+    const words = ev.text.split(/\s+/).filter(w => w);
+    words.forEach(() => wordTs.push(ev.t_ms));
+  });
   const itemMap = {};
   items.forEach(it => itemMap[it.id] = it);
 
@@ -1244,7 +1261,10 @@ function buildRevGrid(which) {
     const wordInput = document.createElement('input');
     wordInput.className = 'rev-word' + (isMismatch ? ' mismatch' : '');
     wordInput.value = word;
-    wordInput.title = 'Editar palavra transcrita';
+    const ts = wordTs[i];
+    wordInput.title = ts !== undefined
+      ? `t = ${(ts/1000).toFixed(2)}s desde início da gravação`
+      : 'Editar palavra transcrita';
     wordInput.addEventListener('input', () => {
       run.words[i] = wordInput.value;
       const exp = item.label.toLowerCase();
@@ -1469,7 +1489,8 @@ function sendToSheets() {
       NRC_autocorrecoes: run.status.filter(s => s === 'AC').length,
       NRC_omissoes: run.status.filter(s => s === 'O').length,
       NRC_asr_transcript: run.asrText || '',
-      NRC_asr_alinhado: run.words ? run.words.join(' ') : '',
+      NRC_asr_alinhado: run.words ? run.words.slice(0,50).join(' ') : '',
+      NRC_asr_events_json: JSON.stringify(run.asrEvents || []),
       ...itemCols,
       observacoes: S.nt
     });
@@ -1477,7 +1498,7 @@ function sendToSheets() {
 
   let sent = 0;
   payloads.forEach(payload => {
-    fetch(SHEETS_URL, { method:'POST', mode:'no-cors',
+    fetch(SHEETS_URL, { method:'POST', mode:'no-cors', keepalive: true,
       headers:{'Content-Type':'text/plain'},
       body: JSON.stringify(payload) })
     .then(() => {
@@ -1503,6 +1524,7 @@ function buildNEXTHIEJson() {
       time_ms: run.timeMs,
       asr_transcript: run.asrText || '',
       asr_aligned_words: run.words || [],
+      asr_events: run.asrEvents || [],
       started_at: run.startedAt,
       completed_at: run.completedAt,
       summary: {
