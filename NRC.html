@@ -303,6 +303,12 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 .mic-prompt .mic-icon { font-size:2rem; margin-bottom:8px; }
 .mic-prompt p { font-size:.82rem; color:#5a4000; line-height:1.6; }
 
+/* Practice grid */
+.practice-grid {
+  display:grid; grid-template-columns:repeat(7,1fr); gap:8px;
+  max-width:460px; width:100%;
+}
+
 @media (max-width:480px) {
   .w-hero, .w-cta-block, .w-credits { padding-left:22px; padding-right:22px; }
   .ran-grid { gap:4px; }
@@ -466,8 +472,27 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
       </div>
       <div class="i-foot">
         <button class="btn btn-ghost btn-sm" onclick="goBackFromInstructions()">← Voltar</button>
-        <button class="btn btn-rosa" id="btn-start-grid" onclick="requestMicAndStart()">🎙 Começar →</button>
+        <button class="btn btn-rosa" id="btn-start-grid" onclick="showPractice()">🎙 Começar →</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PRACTICE ══════ -->
+<div id="sp" class="scr" style="background:linear-gradient(180deg,#FFF8F2,#FFEDE5)">
+  <div class="hdr">
+    <button class="bk" onclick="go('si')">←</button>
+    <div><h2>Treino</h2><p id="sp-subtitle">Vamos praticar primeiro</p></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;gap:28px">
+    <div style="text-align:center;max-width:460px">
+      <p id="sp-instr" style="font-size:.92rem;font-weight:700;color:#2a1a2e;line-height:1.6"></p>
+      <p style="font-size:.72rem;color:#7a6e66;margin-top:6px">Treino · 7 itens · diz da esquerda para a direita</p>
+    </div>
+    <div class="practice-grid" id="practice-grid"></div>
+    <div style="display:flex;gap:12px;margin-top:4px">
+      <button class="btn btn-ghost btn-sm" onclick="go('si')">← Voltar</button>
+      <button class="btn btn-rosa" onclick="startAfterPractice()">Iniciar tarefa →</button>
     </div>
   </div>
 </div>
@@ -821,6 +846,49 @@ function goBackFromInstructions() {
   // If this is the second subtask, can't go back to setup easily
   // Just go back to setup
   go('ss');
+}
+
+/* ══════════════════════════════════════════════════════
+   PRACTICE (7-item warm-up before real task)
+══════════════════════════════════════════════════════ */
+function generatePracticeSequence(items) {
+  // 7 items: all 5 appear once, 2 extras, no consecutive repeats
+  const base = [...items].sort(() => Math.random() - 0.5);
+  const extras = [...items].sort(() => Math.random() - 0.5).slice(0, 2);
+  let seq = [...base, ...extras];
+  // Fix consecutive repeats by swapping forward
+  for (let i = 1; i < seq.length; i++) {
+    if (seq[i].id === seq[i-1].id) {
+      for (let j = i + 1; j < seq.length; j++) {
+        if (seq[j].id !== seq[i-1].id) {
+          [seq[i], seq[j]] = [seq[j], seq[i]];
+          break;
+        }
+      }
+    }
+  }
+  return seq;
+}
+
+function showPractice() {
+  const items = currentRun === 'cores' ? CORES : ANIMAIS;
+  const seq = generatePracticeSequence(items);
+
+  document.getElementById('sp-subtitle').textContent =
+    currentRun === 'cores' ? 'NRC_CORES — Treino' : 'NRC_ANIMAIS — Treino';
+  document.getElementById('sp-instr').textContent =
+    currentRun === 'cores'
+      ? 'Diz o nome de cada cor, da esquerda para a direita.'
+      : 'Diz o nome de cada animal, da esquerda para a direita.';
+
+  const grid = document.getElementById('practice-grid');
+  grid.innerHTML = seq.map(item => `<div class="ran-cell ${item.css}"></div>`).join('');
+
+  go('sp');
+}
+
+function startAfterPractice() {
+  requestMicAndStart();
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1497,7 +1565,7 @@ if (isAdmin) {
   S.sessionId = 'NRC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 5).toUpperCase();
   S.runs = {};
   S.subtasks = { cores: true, animais: true };
-  go('si');
+  prepareSubtask('cores');
 }
 </script>
 </body>
