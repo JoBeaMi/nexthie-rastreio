@@ -271,7 +271,7 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
   <div class="w-cta-block">
     <p>Módulo de rastreio digital para identificação de letras pelo nome. A criança ouve o nome de uma letra e seleciona a letra correta entre 4 opções.</p>
     <div class="w-cta">
-      <button class="btn btn-main btn-lg" onclick="isAdmin ? go('ss') : showInstructions()">Iniciar sessão</button>
+      <button class="btn btn-main btn-lg" onclick="go('ss')">Iniciar sessão</button>
     </div>
   </div>
 
@@ -630,7 +630,9 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
     <div class="r-details" id="r-confusion"></div>
 
     <div style="text-align:center;padding:8px 0 32px">
-      <button class="btn btn-coral btn-lg" onclick="newSession()">Nova Sessão</button>
+      <button class="btn btn-coral btn-lg" onclick="isAdmin ? newSession() : window.location.href='index.html'">
+        <span id="r-next-label">Continuar →</span>
+      </button>
     </div>
   </div>
 </div>
@@ -1061,7 +1063,16 @@ function finish() {
   const y = Math.floor(S.am / 12), m = S.am % 12;
   const ageStr = y + ';' + m;
 
-  // Populate results
+  // Send to Sheets always
+  sendToSheets(correct, total, meanRt, dur, errLetters);
+
+  // Child mode: skip report, go straight back to hub
+  if (!isAdmin) {
+    setTimeout(() => window.location.href = 'index.html', 400);
+    return;
+  }
+
+  // Admin mode: show full results screen
   go('sr');
   document.getElementById('r-meta').textContent = S.dt + ' · ' + S.ex + ' · ' + dur + ' min';
   document.getElementById('r-av').textContent = S.id.slice(0, 2).toUpperCase();
@@ -1156,8 +1167,6 @@ function finish() {
     confEl.style.display = 'none';
   }
 
-  // Send to Sheets
-  sendToSheets(correct, total, meanRt, dur, errLetters);
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1433,7 +1442,7 @@ if (isAdmin) {
   // ── ADMIN MODE: show welcome/setup (for technicians) ──
   go('sw');
 } else {
-  // ── CHILD MODE: load child profile and show welcome screen first ──
+  // ── CHILD MODE (default): straight to game ──
   const dt = new Date().toISOString().slice(0, 10);
 
   // Load active child from localStorage (pilot) or platform (production)
@@ -1461,7 +1470,7 @@ if (isAdmin) {
   S.blocked = false;
   S.playMode = true;
 
-  go('sw');
+  showInstructions();
 }
 </script>
 </body>
