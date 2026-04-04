@@ -9,7 +9,15 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden}
-body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
+
+/* Fantasy background image */
+body{
+  background-image:url(assets/bg.jpg);
+  background-size:cover;
+  background-position:center bottom;
+  background-repeat:no-repeat;
+  background-color:#C5F5EA; /* fallback while image loads */
+}
 
 .world{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 
@@ -19,7 +27,7 @@ body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
 }
 .speech{
   display:inline-block;background:#fff;border-radius:22px;padding:12px 24px;
-  box-shadow:0 4px 16px rgba(0,0,0,.06);font-size:1rem;font-weight:800;color:#0a4a40;
+  box-shadow:0 4px 16px rgba(0,0,0,.12);font-size:1rem;font-weight:800;color:#0a4a40;
   line-height:1.4;opacity:0;transform:translateY(-8px) scale(.95);
   transition:all .4s cubic-bezier(.34,1.56,.64,1);position:relative;
 }
@@ -30,47 +38,76 @@ body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
 .scroll{flex:1;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
 .scroll::-webkit-scrollbar{display:none}
 
-/* Landscape */
+/* Landscape container — transparent, just for positioning */
 .land{height:100%;min-width:max-content;position:relative;padding:0 80px}
 
-/* Sky */
-.cloud{position:absolute;background:rgba(255,255,255,.45);border-radius:50px}
+/* Path track */
+.path-track{position:absolute;bottom:26%;left:60px;right:60px;height:10px;border-radius:5px;background:rgba(255,255,255,.25);z-index:1}
+.path-fill{height:100%;border-radius:5px;background:rgba(255,255,255,.6);transition:width 1s ease}
 
-/* Ground */
-.ground{
-  position:absolute;bottom:0;left:0;right:0;height:40%;
-  background:linear-gradient(180deg,#5DCAA5 0%,#3aab6d 50%,#2d8a56 100%);
-  border-radius:80% 80% 0 0 / 15% 15% 0 0;
+/* Mascot sprite */
+.mascot-on-node{
+  position:absolute;z-index:10;pointer-events:none;
+  transition:all 1s cubic-bezier(.34,1.56,.64,1);
 }
-/* Grass tufts */
-.grass{position:absolute;bottom:38%;width:100%;height:20px;z-index:1;overflow:hidden}
-.tuft{position:absolute;bottom:0;width:24px;height:14px;background:#5DCAA5;border-radius:50% 50% 0 0}
+.m-body{animation:mi 2.5s ease-in-out infinite}
+@keyframes mi{0%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.talking .m-body{animation:tb .3s ease-in-out infinite alternate}
+@keyframes tb{0%{transform:translateY(0) scale(1)}100%{transform:translateY(-3px) scale(1.03)}}
 
-/* Path */
-.path-track{position:absolute;bottom:26%;left:60px;right:60px;height:10px;border-radius:5px;background:rgba(255,255,255,.2);z-index:1}
-.path-fill{height:100%;border-radius:5px;background:rgba(255,255,255,.5);transition:width 1s ease}
-.path-dots{position:absolute;bottom:calc(26% + 2px);left:60px;right:60px;height:6px;z-index:1;display:flex;gap:20px;padding:0 20px}
+.mascot-sprite{
+  width:90px;height:90px;
+  background-image:url(assets/mascot.png);
+  background-size:300% 300%;
+  background-position:0% 0%; /* idle: top-left cell */
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 4px 14px rgba(0,160,144,.3));
+  image-rendering:auto;
+}
+/* Talking pose: top-center cell of sprite */
+.world.talking .mascot-sprite{background-position:50% 0%}
 
 /* Nodes */
 .nodes{
   position:absolute;bottom:18%;left:60px;right:60px;z-index:2;
   display:flex;align-items:flex-end;gap:clamp(50px,12vw,100px);
 }
-
 .gn{display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;position:relative}
-
 .gn-circle{
   width:clamp(100px,26vw,130px);height:clamp(100px,26vw,130px);border-radius:50%;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   border:5px solid rgba(255,255,255,.5);position:relative;transition:all .25s;
-}
-.gn-circle .ico{font-size:clamp(2.4rem,7vw,3.2rem);line-height:1}
-.gn-name{
-  font-size:clamp(.8rem,2.2vw,.95rem);font-weight:900;color:#fff;
-  text-shadow:0 2px 6px rgba(0,0,0,.2);text-align:center;
+  overflow:hidden;
 }
 
-/* Active node: even bigger */
+/* Icon sprite inside each node */
+.gn-ico{
+  width:64%;height:64%;
+  background-image:url(assets/icons.png);
+  background-size:300% 300%;
+  background-repeat:no-repeat;
+  background-position:0% 0%;
+}
+/* Icon positions in the 3×3 sprite (col/row):
+   Row 0: letras(0,0) | nomeacao(1,0) | codigo(2,0)
+   Row 1: frases(0,1) | parecidos(1,1) | rapido(2,1)
+   Row 2: palavras(0,2)| star(1,2)     | lock(2,2)   */
+.gn-ico[data-icon="letras"]    {background-position:0%   0%}
+.gn-ico[data-icon="nomeacao"]  {background-position:50%  0%}
+.gn-ico[data-icon="codigo"]    {background-position:100% 0%}
+.gn-ico[data-icon="frases"]    {background-position:0%   50%}
+.gn-ico[data-icon="parecidos"] {background-position:50%  50%}
+.gn-ico[data-icon="rapido"]    {background-position:100% 50%}
+.gn-ico[data-icon="palavras"]  {background-position:0%   100%}
+.gn-ico[data-icon="star"]      {background-position:50%  100%}
+.gn-ico[data-icon="lock"]      {background-position:100% 100%}
+
+.gn-name{
+  font-size:clamp(.8rem,2.2vw,.95rem);font-weight:900;color:#fff;
+  text-shadow:0 2px 8px rgba(0,0,0,.4);text-align:center;
+}
+
+/* Active node */
 .gn.active .gn-circle{
   width:clamp(115px,30vw,150px);height:clamp(115px,30vw,150px);
   border-width:6px;cursor:pointer;
@@ -85,23 +122,26 @@ body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
 .gn.active .badge{
   position:absolute;top:-14px;right:-8px;background:#fff;color:var(--gc);
   font-size:.7rem;font-weight:900;padding:5px 12px;border-radius:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,.12);animation:bb 1.2s ease-in-out infinite;
+  box-shadow:0 3px 10px rgba(0,0,0,.18);animation:bb 1.2s ease-in-out infinite;
 }
 @keyframes bb{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
 
-/* Locked node: smaller */
+/* Locked node */
 .gn.locked .gn-circle{
   width:clamp(70px,18vw,88px);height:clamp(70px,18vw,88px);
   background:rgba(255,255,255,.12) !important;border:4px dashed rgba(255,255,255,.2);
 }
-.gn.locked .ico{filter:grayscale(1);opacity:.3}
+.gn.locked .gn-ico{filter:grayscale(1);opacity:.3}
 .gn.locked .gn-name{opacity:.3}
 .gn-lock{
   position:absolute;bottom:-4px;right:-4px;width:26px;height:26px;border-radius:50%;
-  background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-size:.7rem;
+  background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:.7rem;
 }
 
-/* Offset nodes up/down for wavy path feel */
+/* Done node */
+.gn.done .gn-circle{opacity:.55}
+
+/* Offset nodes for wavy path feel */
 .gn:nth-child(1){margin-bottom:30px}
 .gn:nth-child(2){margin-bottom:70px}
 .gn:nth-child(3){margin-bottom:20px}
@@ -110,32 +150,25 @@ body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
 .gn:nth-child(6){margin-bottom:55px}
 .gn:nth-child(7){margin-bottom:35px}
 
-/* Mascot on active node */
-.mascot-on-node{
-  position:absolute;z-index:10;pointer-events:none;
-  transition:all 1s cubic-bezier(.34,1.56,.64,1);
-}
-.mascot-on-node svg{overflow:visible;filter:drop-shadow(0 4px 12px rgba(0,160,144,.25))}
-.m-body{animation:mi 2.5s ease-in-out infinite}
-@keyframes mi{0%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
-
-/* Talking */
-.talking .m-mouth-open{display:block !important}
-.talking .m-mouth-smile{display:none}
-.talking .m-body{animation:tb .3s ease-in-out infinite alternate}
-@keyframes tb{0%{transform:translateY(0) scale(1)}100%{transform:translateY(-3px) scale(1.03)}}
-
 /* Tap overlay */
-.tap-ov{position:fixed;inset:0;z-index:50;background:rgba(200,245,234,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .5s}
-.tap-btn{
-  width:130px;height:130px;border-radius:50%;
-  background:linear-gradient(135deg,#00D4B8,#00A090);
-  display:flex;align-items:center;justify-content:center;font-size:3.5rem;
-  box-shadow:0 0 0 0 rgba(0,160,144,.25);animation:gpulse 2s ease-in-out infinite;
+.tap-ov{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(180,240,228,.92);backdrop-filter:blur(4px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:opacity .5s;
+}
+.tap-mascot{
+  width:120px;height:120px;
+  background-image:url(assets/mascot.png);
+  background-size:300% 300%;
+  background-position:0% 0%;
+  background-repeat:no-repeat;
+  animation:gpulse 2s ease-in-out infinite;
+  filter:drop-shadow(0 6px 16px rgba(0,160,144,.35));
   --glow:rgba(0,160,144,.3);--glow2:rgba(0,160,144,.1);
 }
 .tap-ov h2{font-size:1.4rem;font-weight:900;color:#0a4a40;margin-top:18px}
-.tap-ov p{font-size:.85rem;color:rgba(10,74,64,.3);margin-top:4px}
+.tap-ov p{font-size:.85rem;color:rgba(10,74,64,.45);margin-top:4px}
 
 /* Tech */
 .tech-link{position:fixed;bottom:6px;right:10px;font-size:.5rem;color:rgba(0,60,40,.08);cursor:pointer;z-index:3}
@@ -156,7 +189,7 @@ body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
 <body>
 
 <div class="tap-ov" id="tap-ov" onclick="startWelcome()">
-  <div class="tap-btn">🧩</div>
+  <div class="tap-mascot"></div>
   <h2>Toca para começar!</h2>
   <p>Os teus jogos estão à espera</p>
 </div>
@@ -168,60 +201,83 @@ body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
 
   <div class="scroll" id="scroll">
     <div class="land" id="land">
-      <!-- Clouds -->
-      <div class="cloud" style="width:100px;height:36px;top:6%;left:12%"></div>
-      <div class="cloud" style="width:70px;height:26px;top:14%;left:45%"></div>
-      <div class="cloud" style="width:120px;height:40px;top:4%;left:72%"></div>
-      <div class="cloud" style="width:80px;height:28px;top:18%;left:90%"></div>
-
-      <!-- Ground -->
-      <div class="ground"></div>
 
       <!-- Path track -->
       <div class="path-track"><div class="path-fill" style="width:14%"></div></div>
 
-      <!-- Floating mascot (positioned over active node by JS) -->
+      <!-- Mascot (positioned over active node by JS) -->
       <div class="mascot-on-node" id="mascot-float">
-        <svg viewBox="0 0 100 110" width="80" height="88" style="overflow:visible">
-          <g class="m-body">
-            <ellipse cx="50" cy="62" rx="36" ry="40" fill="url(#mg)"/>
-            <ellipse cx="50" cy="70" rx="22" ry="20" fill="rgba(255,255,255,.15)"/>
-            <ellipse cx="28" cy="22" rx="11" ry="10" fill="#00D4B8"/><ellipse cx="28" cy="22" rx="7" ry="6" fill="#4de8d0"/>
-            <ellipse cx="72" cy="22" rx="11" ry="10" fill="#00D4B8"/><ellipse cx="72" cy="22" rx="7" ry="6" fill="#4de8d0"/>
-            <ellipse cx="37" cy="52" rx="11" ry="12" fill="#fff"/><ellipse cx="63" cy="52" rx="11" ry="12" fill="#fff"/>
-            <circle cx="39" cy="53" r="6" fill="#0a3a30"/><circle cx="65" cy="53" r="6" fill="#0a3a30"/>
-            <circle cx="42" cy="49" r="2.5" fill="#fff" opacity=".9"/><circle cx="68" cy="49" r="2.5" fill="#fff" opacity=".9"/>
-            <ellipse cx="37" cy="52" rx="13" ry="0" fill="#00A090"><animate attributeName="ry" values="0;14;0" dur=".18s" begin="2.5s;6s;9s" fill="freeze"/></ellipse>
-            <ellipse cx="63" cy="52" rx="13" ry="0" fill="#00A090"><animate attributeName="ry" values="0;14;0" dur=".18s" begin="2.5s;6s;9s" fill="freeze"/></ellipse>
-            <circle cx="24" cy="64" r="7" fill="#4de8d0" opacity=".3"/><circle cx="76" cy="64" r="7" fill="#4de8d0" opacity=".3"/>
-            <ellipse cx="50" cy="63" rx="2.5" ry="2" fill="#007a6c"/>
-            <path d="M42 73 Q50 82 58 73" stroke="#007a6c" stroke-width="2.5" fill="none" stroke-linecap="round" class="m-mouth-smile"/>
-            <ellipse cx="50" cy="76" rx="8" ry="6" fill="#007a6c" class="m-mouth-open" style="display:none"/>
-            <ellipse cx="36" cy="100" rx="12" ry="6" fill="#00A090"/><ellipse cx="64" cy="100" rx="12" ry="6" fill="#00A090"/>
-          </g>
-          <defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00D4B8"/><stop offset="100%" stop-color="#00A090"/></linearGradient></defs>
-        </svg>
+        <div class="m-body">
+          <div class="mascot-sprite" id="mascot-sprite"></div>
+        </div>
       </div>
 
       <!-- Game nodes -->
       <div class="nodes" id="nodes">
-        <a href="LETRAS_ID.html" class="gn active" id="gn-0" style="--glow:rgba(232,93,117,.35);--glow2:rgba(232,93,117,.12);--gc:#E85D75">
-          <div class="gn-circle" style="background:linear-gradient(145deg,#FF8A9E,#E85D75)"><span class="ico">🔤</span><div class="badge">JOGAR!</div></div>
+
+        <a href="LETRAS_ID.html" class="gn active" id="gn-0"
+           style="--glow:rgba(232,93,117,.35);--glow2:rgba(232,93,117,.12);--gc:#E85D75">
+          <div class="gn-circle" style="background:linear-gradient(145deg,#FF8A9E,#E85D75)">
+            <div class="gn-ico" data-icon="letras"></div>
+            <div class="badge">JOGAR!</div>
+          </div>
           <span class="gn-name">Letras</span>
         </a>
-        <a href="NRC.html" class="gn locked" id="gn-1" style="--glow:rgba(245,166,35,.35);--glow2:rgba(245,166,35,.12);--gc:#F5A623;text-decoration:none">
-          <div class="gn-circle" style="background:linear-gradient(145deg,#FFC85A,#F5A623)"><span class="ico">⚡</span><div class="badge">JOGAR!</div><div class="gn-lock">🔒</div></div>
+
+        <a href="NRC.html" class="gn locked" id="gn-1"
+           style="--glow:rgba(245,166,35,.35);--glow2:rgba(245,166,35,.12);--gc:#F5A623;text-decoration:none">
+          <div class="gn-circle" style="background:linear-gradient(145deg,#FFC85A,#F5A623)">
+            <div class="gn-ico" data-icon="nomeacao"></div>
+            <div class="badge">JOGAR!</div>
+            <div class="gn-lock">🔒</div>
+          </div>
           <span class="gn-name">Nomeação</span>
         </a>
-        <div class="gn locked" id="gn-2"><div class="gn-circle" style="background:linear-gradient(145deg,#A08AEE,#7C6DD8)"><span class="ico">🔮</span><div class="gn-lock">🔒</div></div><span class="gn-name">Código</span></div>
-        <div class="gn locked" id="gn-3"><div class="gn-circle" style="background:linear-gradient(145deg,#6AABEF,#4A90D9)"><span class="ico">🖼️</span><div class="gn-lock">🔒</div></div><span class="gn-name">Frases</span></div>
-        <div class="gn locked" id="gn-4"><div class="gn-circle" style="background:linear-gradient(145deg,#7DD87D,#5CB85C)"><span class="ico">🪢</span><div class="gn-lock">🔒</div></div><span class="gn-name">Parecidos</span></div>
-        <div class="gn locked" id="gn-5"><div class="gn-circle" style="background:linear-gradient(145deg,#F080A8,#D4537E)"><span class="ico">⚡</span><div class="gn-lock">🔒</div></div><span class="gn-name">Rápido</span></div>
-        <div class="gn locked" id="gn-6"><div class="gn-circle" style="background:linear-gradient(145deg,#F0A050,#E67E22)"><span class="ico">🧩</span><div class="gn-lock">🔒</div></div><span class="gn-name">Palavras</span></div>
-      </div>
-    </div>
-  </div>
-</div>
+
+        <div class="gn locked" id="gn-2">
+          <div class="gn-circle" style="background:linear-gradient(145deg,#A08AEE,#7C6DD8)">
+            <div class="gn-ico" data-icon="codigo"></div>
+            <div class="gn-lock">🔒</div>
+          </div>
+          <span class="gn-name">Código</span>
+        </div>
+
+        <div class="gn locked" id="gn-3">
+          <div class="gn-circle" style="background:linear-gradient(145deg,#6AABEF,#4A90D9)">
+            <div class="gn-ico" data-icon="frases"></div>
+            <div class="gn-lock">🔒</div>
+          </div>
+          <span class="gn-name">Frases</span>
+        </div>
+
+        <div class="gn locked" id="gn-4">
+          <div class="gn-circle" style="background:linear-gradient(145deg,#7DD87D,#5CB85C)">
+            <div class="gn-ico" data-icon="parecidos"></div>
+            <div class="gn-lock">🔒</div>
+          </div>
+          <span class="gn-name">Parecidos</span>
+        </div>
+
+        <div class="gn locked" id="gn-5">
+          <div class="gn-circle" style="background:linear-gradient(145deg,#F080A8,#D4537E)">
+            <div class="gn-ico" data-icon="rapido"></div>
+            <div class="gn-lock">🔒</div>
+          </div>
+          <span class="gn-name">Rápido</span>
+        </div>
+
+        <div class="gn locked" id="gn-6">
+          <div class="gn-circle" style="background:linear-gradient(145deg,#F0A050,#E67E22)">
+            <div class="gn-ico" data-icon="palavras"></div>
+            <div class="gn-lock">🔒</div>
+          </div>
+          <span class="gn-name">Palavras</span>
+        </div>
+
+      </div><!-- /nodes -->
+    </div><!-- /land -->
+  </div><!-- /scroll -->
+</div><!-- /world -->
 
 <div class="tech-link" onclick="document.getElementById('tp').classList.add('on')">técnico</div>
 <div class="tp" id="tp" onclick="if(event.target===this)this.classList.remove('on')">
@@ -240,6 +296,7 @@ body{background:linear-gradient(180deg,#C5F5EA 0%,#E8FFF8 40%,#D0F5EC 100%)}
       <button class="tp-btn" onclick="saveC()">Ativar criança</button>
       <div style="margin-top:10px;border-top:1px solid #e8f0ec;padding-top:8px">
         <div class="tp-mod" style="border-color:#E85D75"><div style="width:8px;height:8px;border-radius:50%;background:#E85D75;flex-shrink:0"></div><a href="LETRAS_ID.html?admin=1">Identificação de Letras</a><span style="font-size:.55rem;font-weight:800;color:#00A090;margin-left:auto">Pronto</span></div>
+        <div class="tp-mod" style="border-color:#F5A623"><div style="width:8px;height:8px;border-radius:50%;background:#F5A623;flex-shrink:0"></div><a href="NRC.html?admin=1">Nomeação Rápida de Cores/Animais</a><span style="font-size:.55rem;font-weight:800;color:#00A090;margin-left:auto">Pronto</span></div>
         <div class="tp-mod"><div style="width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0"></div><span style="color:#aaa">Mais módulos em desenvolvimento</span></div>
       </div>
       <p style="font-size:.5rem;color:#ccc;margin-top:8px">NEXTHIE · CENTRO2030-FSE+-02336600 · Joana Miguel</p>
@@ -256,17 +313,17 @@ function posMascot(){
   const circle=active.querySelector('.gn-circle');
   const r=circle.getBoundingClientRect();
   const land=document.getElementById('land').getBoundingClientRect();
-  m.style.left=(r.left-land.left+r.width/2-40)+'px';
+  m.style.left=(r.left-land.left+r.width/2-45)+'px';
   m.style.bottom=(land.bottom-r.top+10)+'px';
 }
 setTimeout(posMascot,150);
 window.addEventListener('resize',posMascot);
 document.getElementById('scroll').addEventListener('scroll',posMascot);
 
-// Welcome
+// Welcome speech
 const W1='Olá! Vamos jogar? Estes são os jogos que tens para ti. À medida que fores jogando, aparecem jogos novos! Diverte-te!';
 const W2='Toca num jogo para começares!';
-const BB=['Olá! Vamos jogar? 🎉','Estes são os teus jogos!','Jogos novos vão aparecendo! ✨','Diverte-te! 🎈','Toca num jogo para começares! 👆'];
+const BB=['Olá! Vamos jogar?','Estes são os teus jogos!','Jogos novos vão aparecendo!','Diverte-te!','Toca num jogo para começares!'];
 function gv(){const v=speechSynthesis.getVoices(),p=v.filter(x=>x.lang==='pt-PT'),a=v.filter(x=>x.lang.startsWith('pt'));return p.find(x=>/femin|female|joana|ines|raquel/i.test(x.name))||p[0]||a[0]||null}
 
 function startWelcome(){const o=document.getElementById('tap-ov');o.style.opacity='0';setTimeout(()=>o.style.display='none',500);playWelcome()}
@@ -285,7 +342,7 @@ function playWelcome(){
   },700)};
   u1.onerror=()=>dn(pt,w,sp);speechSynthesis.speak(u1);
 }
-function dn(t,w,sp){clearInterval(t);w.classList.remove('talking');sp.textContent='Toca num jogo! 👆';setTimeout(()=>sp.classList.remove('on'),4000)}
+function dn(t,w,sp){clearInterval(t);w.classList.remove('talking');sp.textContent='Toca num jogo!';setTimeout(()=>sp.classList.remove('on'),4000)}
 if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=()=>{};
 
 // Progress: unlock nodes based on completed activities
@@ -302,7 +359,6 @@ if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=(
       const isDone = done.includes(act.code);
       const prevDone = i === 0 || done.includes(SEQUENCE[i-1].code);
       if (isDone) {
-        // completed: show as done, not active
         el.classList.remove('active','locked');
         el.classList.add('done');
         el.querySelector('.badge')?.remove();
@@ -310,7 +366,6 @@ if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=(
         const circle = el.querySelector('.gn-circle');
         if (circle) circle.style.opacity = '0.55';
       } else if (prevDone) {
-        // next up: unlock and make active
         el.classList.remove('locked');
         el.classList.add('active');
         el.querySelector('.gn-lock')?.remove();
@@ -319,13 +374,10 @@ if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=(
   } catch(e) {}
 })();
 
-// Child
+// Child management
 function saveC(){const id=document.getElementById('tc-id').value.trim(),dob=document.getElementById('tc-dob').value;if(!id||!dob){alert('Código e data de nascimento.');return}localStorage.setItem('nexthie_active_child',JSON.stringify({id,dob,sex:document.getElementById('tc-sex').value,sch:document.getElementById('tc-sch').value.trim(),tech:document.getElementById('tc-tech').value.trim(),plnm:document.getElementById('tc-plnm').checked}));loadC();alert('Criança ativada: '+id)}
 function loadC(){try{const c=JSON.parse(localStorage.getItem('nexthie_active_child')),e=document.getElementById('tc-a');if(c&&c.id){e.innerHTML='<b style="color:#00A090">'+c.id+'</b> · '+c.dob;document.getElementById('tc-id').value=c.id;document.getElementById('tc-dob').value=c.dob;document.getElementById('tc-sex').value=c.sex||'';document.getElementById('tc-sch').value=c.sch||'';document.getElementById('tc-tech').value=c.tech||'';document.getElementById('tc-plnm').checked=c.plnm||false}else{e.textContent='Nenhuma'}}catch(e){}}
 loadC();
-
-// Grass tufts
-(function(){const g=document.querySelector('.ground');if(!g)return;for(let i=0;i<30;i++){const t=document.createElement('div');t.className='tuft';t.style.cssText=`left:${Math.random()*100}%;bottom:${92+Math.random()*6}%;width:${16+Math.random()*16}px;height:${8+Math.random()*10}px;background:hsl(${145+Math.random()*15},${50+Math.random()*20}%,${50+Math.random()*15}%)`;g.appendChild(t)}})();
 </script>
 </body>
 </html>
