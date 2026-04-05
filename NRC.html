@@ -636,10 +636,10 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 </div>
 
 <!-- ══════ CHILD WELCOME ══════ -->
-<div id="scw" class="scr">
+<div id="scw" class="scr" onclick="activateWelcomeVideo()">
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;
     background:linear-gradient(180deg,#E0F7F4 0%,#FFF8F2 60%,#FFEDE5 100%);text-align:center;gap:18px">
-    <video id="vid-welcome" muted playsinline webkit-playsinline loop
+    <video id="vid-welcome" muted playsinline webkit-playsinline loop preload="auto"
       style="width:160px;height:160px;border-radius:50%;object-fit:cover;
         box-shadow:0 6px 28px rgba(0,160,144,.25);background:#E0F7F4">
       <source src="assets/nexthie_mascot_wave.mp4" type="video/mp4">
@@ -648,8 +648,9 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
     <p style="font-size:1rem;font-weight:700;color:#7a6e66;max-width:320px;line-height:1.5">
       Vais dizer os nomes das cores e dos animais o mais rápido que conseguires!
     </p>
-    <button onclick="childStartGame()" style="
-      margin-top:12px;padding:16px 48px;font-size:1.2rem;font-weight:900;font-family:inherit;
+    <p id="scw-tap" style="font-size:.85rem;color:rgba(0,160,144,.6);margin-top:4px;animation:bb 1.2s ease-in-out infinite">Toca para continuar</p>
+    <button id="scw-btn" onclick="event.stopPropagation();childStartGame()" style="
+      display:none;margin-top:12px;padding:16px 48px;font-size:1.2rem;font-weight:900;font-family:inherit;
       border:none;border-radius:60px;color:#fff;cursor:pointer;
       background:linear-gradient(135deg,#00D4B8,#00A090);
       box-shadow:0 6px 24px rgba(0,160,144,.35);
@@ -1418,7 +1419,7 @@ function showResults() {
     } catch(e) {}
     go('scd');
     const vd = document.getElementById('vid-done');
-    if (vd) vd.play().catch(()=>{});
+    if (vd) { vd.muted = true; vd.play().catch(()=>{}); }
     setTimeout(() => window.location.href = 'index.html', 3000);
     return;
   }
@@ -1779,9 +1780,19 @@ if (isAdmin) {
   S.runs = {};
   S.subtasks = { cores: true, animais: true };
   go('scw'); // child welcome screen
-  // Force play (autoplay often blocked by browsers)
-  const vw = document.getElementById('vid-welcome');
-  if (vw) vw.play().catch(()=>{});
+}
+
+let welcomeActivated = false;
+function activateWelcomeVideo() {
+  if (welcomeActivated) return;
+  welcomeActivated = true;
+  const v = document.getElementById('vid-welcome');
+  if (v) { v.muted = true; v.play().catch(()=>{}); }
+  // Hide tap hint, show Jogar button
+  const tap = document.getElementById('scw-tap');
+  if (tap) tap.style.display = 'none';
+  const btn = document.getElementById('scw-btn');
+  if (btn) btn.style.display = '';
 }
 
 function childStartGame() {
