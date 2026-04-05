@@ -8,90 +8,60 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden;background:#1a3a2a}
 
-/* Fantasy background image */
-body{
-  background-image:url(assets/bg-world.jpg);
-  background-size:cover;
-  background-position:center bottom;
-  background-repeat:no-repeat;
-  background-color:#C5F5EA; /* fallback while image loads */
-}
+.world{height:100dvh;width:100%;display:flex;flex-direction:column;overflow:hidden}
 
-.world{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-
-/* Speech bubble at top */
+/* Speech bubble */
 .top-speech{
-  flex-shrink:0;text-align:center;padding:14px 20px 6px;position:relative;z-index:3;
+  position:fixed;top:0;left:0;right:0;z-index:20;
+  text-align:center;padding:12px 20px 6px;pointer-events:none;
 }
 .speech{
-  display:inline-block;background:#fff;border-radius:22px;padding:12px 24px;
-  box-shadow:0 4px 16px rgba(0,0,0,.12);font-size:1rem;font-weight:800;color:#0a4a40;
+  display:inline-block;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  border-radius:22px;padding:10px 22px;
+  box-shadow:0 4px 16px rgba(0,0,0,.12);font-size:.95rem;font-weight:800;color:#0a4a40;
   line-height:1.4;opacity:0;transform:translateY(-8px) scale(.95);
   transition:all .4s cubic-bezier(.34,1.56,.64,1);position:relative;
 }
 .speech.on{opacity:1;transform:translateY(0) scale(1)}
-.speech::after{content:'';position:absolute;bottom:-8px;left:50%;margin-left:-8px;border:8px solid transparent;border-top-color:#fff}
+.speech::after{content:'';position:absolute;bottom:-8px;left:50%;margin-left:-8px;border:8px solid transparent;border-top-color:rgba(255,255,255,.92)}
 
-/* Scroll */
-.scroll{flex:1;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
-.scroll::-webkit-scrollbar{display:none}
-
-/* Landscape container — transparent, just for positioning */
-.land{height:100%;min-width:max-content;position:relative;padding:0 80px}
-
-/* Path track */
-.path-track{position:absolute;bottom:26%;left:60px;right:60px;height:10px;border-radius:5px;background:rgba(255,255,255,.25);z-index:1}
-.path-fill{height:100%;border-radius:5px;background:rgba(255,255,255,.6);transition:width 1s ease}
-
-/* Mascot sprite — sheet is 1024×1536, 3×3 cells each 341×512 (2:3 ratio) */
-.mascot-on-node{
-  position:absolute;z-index:10;pointer-events:none;
-  transition:all 1s cubic-bezier(.34,1.56,.64,1);
+/* Scene container — matches bg image aspect ratio 1536:1024 = 3:2 */
+.scene-wrap{
+  flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;
 }
-.m-body{animation:mi 2.5s ease-in-out infinite}
-@keyframes mi{0%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
-.talking .m-body{animation:tb .3s ease-in-out infinite alternate}
-@keyframes tb{0%{transform:translateY(0) scale(1)}100%{transform:translateY(-3px) scale(1.03)}}
-
-.mascot-sprite{
-  width:70px;height:105px; /* 2:3 ratio = one sprite cell */
-  background-image:url(assets/mascot.png);
-  background-size:300% 300%;
-  background-position:0% 0%; /* idle: row0 col0 */
-  background-repeat:no-repeat;
-  filter:drop-shadow(0 4px 14px rgba(0,160,144,.3));
-}
-/* Talking pose: row1 col1 (arms out / happy) */
-.world.talking .mascot-sprite{background-position:50% 50%}
-
-/* Nodes */
-.nodes{
-  position:absolute;bottom:18%;left:60px;right:60px;z-index:2;
-  display:flex;align-items:flex-end;gap:clamp(50px,12vw,100px);
-}
-.gn{display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;position:relative}
-.gn-circle{
-  width:clamp(100px,26vw,130px);height:clamp(100px,26vw,130px);border-radius:50%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  border:5px solid rgba(255,255,255,.5);position:relative;transition:all .25s;
+.scene{
+  position:relative;width:100%;max-height:100dvh;
+  aspect-ratio:3/2;
+  background:url(assets/bg-world.jpg) center/cover no-repeat;
   overflow:hidden;
 }
+/* On very tall screens (portrait phone), scene fills width and centers vertically */
+@media (max-aspect-ratio:3/2){
+  .scene{width:100%;height:auto}
+}
+@media (min-aspect-ratio:3/2){
+  .scene{height:100dvh;width:auto}
+}
 
-/* Icon sprite — 1024×1536, 3×3 cells each 341×512 (2:3 ratio)
-   Actual icons:
-   Row 0: ABC-Letras(0,0) | Brain-Código(1,0)   | Crystal-Rápido(2,0)
-   Row 1: CAO-Nomeação(0,1)| Book-Frases(1,1)   | Puzzle-Parecidos(2,1)
-   Row 2: Lock(0,2)        | Star(1,2)           | Flag-Palavras(2,2)   */
+/* ── Game nodes: positioned absolutely on the stepping stones ── */
+.gn{
+  position:absolute;display:flex;flex-direction:column;align-items:center;
+  gap:4px;text-decoration:none;z-index:5;
+  transform:translate(-50%,-50%); /* center on the point */
+}
+.gn-circle{
+  width:clamp(48px,9vw,80px);height:clamp(48px,9vw,80px);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:3px solid rgba(255,255,255,.6);position:relative;transition:all .25s;
+  overflow:hidden;
+}
 .gn-ico{
-  /* 2:3 ratio cell, sized to fill ~65% of circle width */
-  width:56%;
-  height:calc(56% * 512 / 341); /* ≈84% — preserves 2:3 */
+  width:60%;height:60%;
   background-image:url(assets/icons.png);
   background-size:300% 300%;
   background-repeat:no-repeat;
-  background-position:0% 0%;
 }
 .gn-ico[data-icon="letras"]    {background-position:0%   0%}
 .gn-ico[data-icon="codigo"]    {background-position:50%  0%}
@@ -104,52 +74,58 @@ body{
 .gn-ico[data-icon="palavras"]  {background-position:100% 100%}
 
 .gn-name{
-  font-size:clamp(.8rem,2.2vw,.95rem);font-weight:900;color:#fff;
-  text-shadow:0 2px 8px rgba(0,0,0,.4);text-align:center;
+  font-size:clamp(.55rem,1.6vw,.78rem);font-weight:900;color:#fff;
+  text-shadow:0 2px 6px rgba(0,0,0,.5);text-align:center;white-space:nowrap;
 }
 
-/* Active node */
+/* Active node — bigger, glowing, pulsing */
 .gn.active .gn-circle{
-  width:clamp(115px,30vw,150px);height:clamp(115px,30vw,150px);
-  border-width:6px;cursor:pointer;
-  box-shadow:0 8px 36px var(--glow);
+  width:clamp(60px,12vw,100px);height:clamp(60px,12vw,100px);
+  border-width:4px;cursor:pointer;
+  box-shadow:0 4px 24px var(--glow),0 0 0 6px var(--glow2);
   animation:gpulse 2s ease-in-out infinite;
 }
 .gn.active .gn-circle:active{transform:scale(.88)}
 @keyframes gpulse{
-  0%,100%{box-shadow:0 8px 36px var(--glow)}
-  50%{box-shadow:0 10px 44px var(--glow),0 0 0 14px var(--glow2)}
+  0%,100%{box-shadow:0 4px 24px var(--glow),0 0 0 6px var(--glow2)}
+  50%{box-shadow:0 6px 32px var(--glow),0 0 0 12px var(--glow2)}
 }
 .gn.active .badge{
-  position:absolute;top:-14px;right:-8px;background:#fff;color:var(--gc);
-  font-size:.7rem;font-weight:900;padding:5px 12px;border-radius:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,.18);animation:bb 1.2s ease-in-out infinite;
+  position:absolute;top:-12px;right:-10px;background:#fff;color:var(--gc);
+  font-size:clamp(.5rem,1.2vw,.65rem);font-weight:900;padding:3px 8px;border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,.18);animation:bb 1.2s ease-in-out infinite;
 }
-@keyframes bb{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+@keyframes bb{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
 
-/* Locked node */
+/* Locked node — smaller, faded */
 .gn.locked .gn-circle{
-  width:clamp(70px,18vw,88px);height:clamp(70px,18vw,88px);
-  background:rgba(255,255,255,.12) !important;border:4px dashed rgba(255,255,255,.2);
+  width:clamp(38px,7vw,60px);height:clamp(38px,7vw,60px);
+  background:rgba(255,255,255,.15) !important;border:3px dashed rgba(255,255,255,.25);
 }
 .gn.locked .gn-ico{filter:grayscale(1);opacity:.3}
-.gn.locked .gn-name{opacity:.3}
+.gn.locked .gn-name{opacity:.35}
 .gn-lock{
-  position:absolute;bottom:-4px;right:-4px;width:26px;height:26px;border-radius:50%;
-  background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:.7rem;
+  position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;
+  background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:.55rem;
 }
 
 /* Done node */
-.gn.done .gn-circle{opacity:.55}
+.gn.done .gn-circle{opacity:.5}
 
-/* Offset nodes for wavy path feel */
-.gn:nth-child(1){margin-bottom:30px}
-.gn:nth-child(2){margin-bottom:70px}
-.gn:nth-child(3){margin-bottom:20px}
-.gn:nth-child(4){margin-bottom:60px}
-.gn:nth-child(5){margin-bottom:10px}
-.gn:nth-child(6){margin-bottom:55px}
-.gn:nth-child(7){margin-bottom:35px}
+/* Mascot floating above active node */
+.mascot-float{
+  position:absolute;z-index:10;pointer-events:none;
+  transform:translate(-50%,-100%);
+  transition:all 1s cubic-bezier(.34,1.56,.64,1);
+}
+.mascot-float img{
+  width:clamp(50px,9vw,80px);height:auto;
+  filter:drop-shadow(0 4px 12px rgba(0,160,144,.35));
+  animation:mascot-bob 2.5s ease-in-out infinite;
+}
+@keyframes mascot-bob{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}
+.world.talking .mascot-float img{animation:mascot-talk .3s ease-in-out infinite alternate}
+@keyframes mascot-talk{0%{transform:translateY(0) scale(1)}100%{transform:translateY(-3px) scale(1.04)}}
 
 /* Tap overlay */
 .tap-ov{
@@ -158,19 +134,16 @@ body{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   cursor:pointer;transition:opacity .5s;
 }
-.tap-mascot{
-  width:100px;height:150px; /* 2:3 ratio */
-  background-image:url(assets/mascot.png);
-  background-size:300% 300%;
-  background-position:100% 100%; /* celebrating pose: row2 col2 */
-  background-repeat:no-repeat;
-  filter:drop-shadow(0 6px 16px rgba(0,160,144,.35));
+.tap-ov img{
+  width:110px;height:auto;
+  filter:drop-shadow(0 6px 18px rgba(0,160,144,.35));
+  animation:mascot-bob 2s ease-in-out infinite;
 }
 .tap-ov h2{font-size:1.4rem;font-weight:900;color:#0a4a40;margin-top:18px}
 .tap-ov p{font-size:.85rem;color:rgba(10,74,64,.45);margin-top:4px}
 
-/* Tech */
-.tech-link{position:fixed;bottom:6px;right:10px;font-size:.5rem;color:rgba(0,60,40,.08);cursor:pointer;z-index:3}
+/* Tech panel */
+.tech-link{position:fixed;bottom:6px;right:10px;font-size:.5rem;color:rgba(255,255,255,.08);cursor:pointer;z-index:3}
 .tp{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.35);padding:16px;overflow-y:auto;align-items:center;justify-content:center}
 .tp.on{display:flex}
 .tp-inner{max-width:440px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.15)}
@@ -188,7 +161,7 @@ body{
 <body>
 
 <div class="tap-ov" id="tap-ov" onclick="startWelcome()">
-  <div class="tap-mascot"></div>
+  <img src="assets/mascot_wave.png" alt="Mascote">
   <h2>Toca para começar!</h2>
   <p>Os teus jogos estão à espera</p>
 </div>
@@ -198,84 +171,87 @@ body{
     <div class="speech" id="speech">Olá! Escolhe um jogo!</div>
   </div>
 
-  <div class="scroll" id="scroll">
-    <div class="land" id="land">
+  <div class="scene-wrap">
+    <div class="scene" id="scene">
 
-      <!-- Path track -->
-      <div class="path-track"><div class="path-fill" style="width:14%"></div></div>
-
-      <!-- Mascot (positioned over active node by JS) -->
-      <div class="mascot-on-node" id="mascot-float">
-        <div class="m-body">
-          <div class="mascot-sprite" id="mascot-sprite"></div>
-        </div>
+      <!-- Mascot (positioned by JS above active node) -->
+      <div class="mascot-float" id="mascot-float">
+        <img src="assets/mascot_smile.png" alt="Mascote">
       </div>
 
-      <!-- Game nodes -->
-      <div class="nodes" id="nodes">
-
-        <a href="LETRAS_ID.html" class="gn active" id="gn-0"
-           style="--glow:rgba(232,93,117,.35);--glow2:rgba(232,93,117,.12);--gc:#E85D75">
-          <div class="gn-circle" style="background:linear-gradient(145deg,#FF8A9E,#E85D75)">
-            <div class="gn-ico" data-icon="letras"></div>
-            <div class="badge">JOGAR!</div>
-          </div>
-          <span class="gn-name">Letras</span>
-        </a>
-
-        <a href="NRC.html" class="gn locked" id="gn-1"
-           style="--glow:rgba(245,166,35,.35);--glow2:rgba(245,166,35,.12);--gc:#F5A623;text-decoration:none">
-          <div class="gn-circle" style="background:linear-gradient(145deg,#FFC85A,#F5A623)">
-            <div class="gn-ico" data-icon="nomeacao"></div>
-            <div class="badge">JOGAR!</div>
-            <div class="gn-lock">🔒</div>
-          </div>
-          <span class="gn-name">Nomeação</span>
-        </a>
-
-        <div class="gn locked" id="gn-2">
-          <div class="gn-circle" style="background:linear-gradient(145deg,#A08AEE,#7C6DD8)">
-            <div class="gn-ico" data-icon="lock"></div>
-            <div class="gn-lock">🔒</div>
-          </div>
-          <span class="gn-name">Código</span>
+      <!-- Node 0: Letras — 1st stepping stone (bottom-left) -->
+      <a href="LETRAS_ID.html" class="gn active" id="gn-0"
+         style="left:31%;top:83%;--glow:rgba(232,93,117,.35);--glow2:rgba(232,93,117,.12);--gc:#E85D75">
+        <div class="gn-circle" style="background:linear-gradient(145deg,#FF8A9E,#E85D75)">
+          <div class="gn-ico" data-icon="letras"></div>
+          <div class="badge">JOGAR!</div>
         </div>
+        <span class="gn-name">Letras</span>
+      </a>
 
-        <div class="gn locked" id="gn-3">
-          <div class="gn-circle" style="background:linear-gradient(145deg,#6AABEF,#4A90D9)">
-            <div class="gn-ico" data-icon="lock"></div>
-            <div class="gn-lock">🔒</div>
-          </div>
-          <span class="gn-name">Frases</span>
+      <!-- Node 1: Nomeação — 2nd stone -->
+      <a href="NRC.html" class="gn locked" id="gn-1"
+         style="left:37%;top:73%;--glow:rgba(245,166,35,.35);--glow2:rgba(245,166,35,.12);--gc:#F5A623;text-decoration:none">
+        <div class="gn-circle" style="background:linear-gradient(145deg,#FFC85A,#F5A623)">
+          <div class="gn-ico" data-icon="nomeacao"></div>
+          <div class="badge">JOGAR!</div>
+          <div class="gn-lock">🔒</div>
         </div>
+        <span class="gn-name">Nomeação</span>
+      </a>
 
-        <div class="gn locked" id="gn-4">
-          <div class="gn-circle" style="background:linear-gradient(145deg,#7DD87D,#5CB85C)">
-            <div class="gn-ico" data-icon="lock"></div>
-            <div class="gn-lock">🔒</div>
-          </div>
-          <span class="gn-name">Parecidos</span>
+      <!-- Node 2: Código — 3rd stone -->
+      <div class="gn locked" id="gn-2"
+           style="left:47%;top:78%">
+        <div class="gn-circle" style="background:linear-gradient(145deg,#A08AEE,#7C6DD8)">
+          <div class="gn-ico" data-icon="lock"></div>
+          <div class="gn-lock">🔒</div>
         </div>
+        <span class="gn-name">Código</span>
+      </div>
 
-        <div class="gn locked" id="gn-5">
-          <div class="gn-circle" style="background:linear-gradient(145deg,#F080A8,#D4537E)">
-            <div class="gn-ico" data-icon="lock"></div>
-            <div class="gn-lock">🔒</div>
-          </div>
-          <span class="gn-name">Rápido</span>
+      <!-- Node 3: Frases — 4th stone -->
+      <div class="gn locked" id="gn-3"
+           style="left:53%;top:68%">
+        <div class="gn-circle" style="background:linear-gradient(145deg,#6AABEF,#4A90D9)">
+          <div class="gn-ico" data-icon="lock"></div>
+          <div class="gn-lock">🔒</div>
         </div>
+        <span class="gn-name">Frases</span>
+      </div>
 
-        <div class="gn locked" id="gn-6">
-          <div class="gn-circle" style="background:linear-gradient(145deg,#F0A050,#E67E22)">
-            <div class="gn-ico" data-icon="lock"></div>
-            <div class="gn-lock">🔒</div>
-          </div>
-          <span class="gn-name">Palavras</span>
+      <!-- Node 4: Parecidos — 5th stone -->
+      <div class="gn locked" id="gn-4"
+           style="left:60%;top:61%">
+        <div class="gn-circle" style="background:linear-gradient(145deg,#7DD87D,#5CB85C)">
+          <div class="gn-ico" data-icon="lock"></div>
+          <div class="gn-lock">🔒</div>
         </div>
+        <span class="gn-name">Parecidos</span>
+      </div>
 
-      </div><!-- /nodes -->
-    </div><!-- /land -->
-  </div><!-- /scroll -->
+      <!-- Node 5: Rápido — 6th stone near tree -->
+      <div class="gn locked" id="gn-5"
+           style="left:65%;top:53%">
+        <div class="gn-circle" style="background:linear-gradient(145deg,#F080A8,#D4537E)">
+          <div class="gn-ico" data-icon="lock"></div>
+          <div class="gn-lock">🔒</div>
+        </div>
+        <span class="gn-name">Rápido</span>
+      </div>
+
+      <!-- Node 6: Palavras — portal in the tree -->
+      <div class="gn locked" id="gn-6"
+           style="left:70%;top:42%">
+        <div class="gn-circle" style="background:linear-gradient(145deg,#F0A050,#E67E22)">
+          <div class="gn-ico" data-icon="lock"></div>
+          <div class="gn-lock">🔒</div>
+        </div>
+        <span class="gn-name">Palavras</span>
+      </div>
+
+    </div><!-- /scene -->
+  </div><!-- /scene-wrap -->
 </div><!-- /world -->
 
 <div class="tech-link" onclick="document.getElementById('tp').classList.add('on')">técnico</div>
@@ -306,18 +282,16 @@ body{
 <script>
 // Position mascot above active node
 function posMascot(){
-  const active=document.querySelector('.gn.active');
-  const m=document.getElementById('mascot-float');
-  if(!active||!m)return;
-  const circle=active.querySelector('.gn-circle');
-  const r=circle.getBoundingClientRect();
-  const land=document.getElementById('land').getBoundingClientRect();
-  m.style.left=(r.left-land.left+r.width/2-35)+'px';
-  m.style.bottom=(land.bottom-r.top+10)+'px';
+  const active = document.querySelector('.gn.active');
+  const m = document.getElementById('mascot-float');
+  if (!active || !m) return;
+  m.style.left = active.style.left;
+  // Place mascot above the node (offset by node height)
+  const topVal = parseFloat(active.style.top);
+  m.style.top = (topVal - 8) + '%';
 }
-setTimeout(posMascot,150);
-window.addEventListener('resize',posMascot);
-document.getElementById('scroll').addEventListener('scroll',posMascot);
+setTimeout(posMascot, 100);
+window.addEventListener('resize', posMascot);
 
 // Welcome speech
 const W1='Olá! Vamos jogar? Estes são os jogos que tens para ti. À medida que fores jogando, aparecem jogos novos! Diverte-te!';
@@ -344,7 +318,7 @@ function playWelcome(){
 function dn(t,w,sp){clearInterval(t);w.classList.remove('talking');sp.textContent='Toca num jogo!';setTimeout(()=>sp.classList.remove('on'),4000)}
 if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=()=>{};
 
-// Progress: unlock nodes based on completed activities
+// Progress: unlock nodes
 (function(){
   const SEQUENCE = [
     { id:'gn-0', code:'LETRAS_ID' },
@@ -370,6 +344,8 @@ if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=(
         el.querySelector('.gn-lock')?.remove();
       }
     });
+    // Reposition mascot after unlock changes
+    setTimeout(posMascot, 150);
   } catch(e) {}
 })();
 
