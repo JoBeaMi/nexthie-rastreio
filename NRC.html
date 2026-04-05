@@ -635,6 +635,45 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
   </div>
 </div>
 
+<!-- ══════ CHILD WELCOME ══════ -->
+<div id="scw" class="scr">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;
+    background:linear-gradient(180deg,#E0F7F4 0%,#FFF8F2 60%,#FFEDE5 100%);text-align:center;gap:18px">
+    <video src="assets/nexthie_mascot_wave.mp4" autoplay loop muted playsinline
+      style="width:160px;height:160px;border-radius:50%;object-fit:cover;
+        box-shadow:0 6px 28px rgba(0,160,144,.25)"></video>
+    <h1 style="font-size:1.6rem;font-weight:900;color:#2a1a2e;line-height:1.3">Jogo das Cores<br>e dos Animais</h1>
+    <p style="font-size:1rem;font-weight:700;color:#7a6e66;max-width:320px;line-height:1.5">
+      Vais dizer os nomes das cores e dos animais o mais rápido que conseguires!
+    </p>
+    <button onclick="childStartGame()" style="
+      margin-top:12px;padding:16px 48px;font-size:1.2rem;font-weight:900;font-family:inherit;
+      border:none;border-radius:60px;color:#fff;cursor:pointer;
+      background:linear-gradient(135deg,#00D4B8,#00A090);
+      box-shadow:0 6px 24px rgba(0,160,144,.35);
+      transition:transform .15s;
+    " onpointerdown="this.style.transform='scale(.92)'" onpointerup="this.style.transform='scale(1)'">
+      Jogar!
+    </button>
+  </div>
+</div>
+
+<!-- ══════ CHILD DONE ══════ -->
+<div id="scd" class="scr">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;
+    background:linear-gradient(180deg,#FFF8F2 0%,#E0F7F4 60%,#C5F5EA 100%);text-align:center;gap:18px">
+    <video src="assets/nexthie_mascot_wave.mp4" autoplay loop muted playsinline
+      style="width:160px;height:160px;border-radius:50%;object-fit:cover;
+        box-shadow:0 6px 28px rgba(0,160,144,.25)"></video>
+    <h1 style="font-size:1.8rem;font-weight:900;color:#2a1a2e">Muito bem!</h1>
+    <p style="font-size:1rem;font-weight:700;color:#7a6e66;max-width:320px;line-height:1.5">
+      Fizeste um ótimo trabalho!<br>Vamos voltar aos jogos.
+    </p>
+    <div style="margin-top:8px;width:60px;height:60px;border:4px solid #00D4B8;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>
+  </div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
 <div class="toast" id="toast">—</div>
 
 
@@ -1366,14 +1405,15 @@ function showResults() {
   // Send to Sheets always
   sendToSheets();
 
-  // Child mode: skip report, mark done, go straight back to hub
+  // Child mode: show "Muito bem!" screen, mark done, redirect after 3s
   if (!isAdmin) {
     try {
       const done = JSON.parse(localStorage.getItem('nexthie_done') || '[]');
       if (!done.includes('NRC')) done.push('NRC');
       localStorage.setItem('nexthie_done', JSON.stringify(done));
     } catch(e) {}
-    setTimeout(() => window.location.href = 'index.html', 400);
+    go('scd');
+    setTimeout(() => window.location.href = 'index.html', 3000);
     return;
   }
 
@@ -1732,6 +1772,10 @@ if (isAdmin) {
   S.sessionId = 'NRC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 5).toUpperCase();
   S.runs = {};
   S.subtasks = { cores: true, animais: true };
+  go('scw'); // child welcome screen
+}
+
+function childStartGame() {
   prepareSubtask('cores');
 }
 </script>
