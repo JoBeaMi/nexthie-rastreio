@@ -643,7 +643,7 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 /* ══════════════════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════════════════ */
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby8hFjd5pEgJDnEcpLjjKjRIWV04ONVM9xk7DGwhDBCllmJF28M3HSYu_GU5qFMpBgp/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzUWK1kQWYERtz7Zx0NxrwjrgNOuZhp5Zz12PIJki--hTwprNI1R0mU5hXeqU8aoQAv/exec';
 const MODULE_CODE = 'LETRAS_ID';
 const MODULE_VERSION = '1.0';
 
@@ -1175,20 +1175,42 @@ function finish() {
 }
 
 /* ══════════════════════════════════════════════════════
-   GOOGLE SHEETS
+   GOOGLE SHEETS — post via hidden form+iframe (no CORS issues)
 ══════════════════════════════════════════════════════ */
+function postToSheets(url, data) {
+  return new Promise((resolve, reject) => {
+    try {
+      const id = 'sf_' + Date.now();
+      const iframe = document.createElement('iframe');
+      iframe.name = id; iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      const form = document.createElement('form');
+      form.method = 'POST'; form.action = url; form.target = id;
+      const inp = document.createElement('textarea');
+      inp.name = 'payload'; inp.value = JSON.stringify(data);
+      form.appendChild(inp);
+      document.body.appendChild(form);
+
+      iframe.onload = () => { resolve(); setTimeout(() => { iframe.remove(); form.remove(); }, 500); };
+      iframe.onerror = () => { reject(); iframe.remove(); form.remove(); };
+      form.submit();
+      console.log('postToSheets submitted:', data);
+      // Safety: resolve after 4s even if iframe doesn't fire onload (cross-origin)
+      setTimeout(() => { resolve(); try { iframe.remove(); form.remove(); } catch(e){} }, 4000);
+    } catch(e) { console.error('postToSheets error:', e); reject(e); }
+  });
+}
+
 function sendToSheets(correct, total, meanRt, dur, errLetters) {
   if (!SHEETS_URL) return;
   const ss = document.getElementById('sync-status');
   ss.innerHTML = '<span class="sync-badge wait">⏳ A guardar…</span>';
 
-  // Build item-level columns
   const itemCols = {};
   S.items.forEach(item => {
     const r = S.resp[item.col];
-    // Match Joana's column names: 3B5, 3B6, ... (0/1)
     itemCols[item.col]           = r ? (r.is_correct ? 1 : 0) : '';
-    // Extra digital-only columns
     itemCols[item.col + '_resp'] = r ? r.selected_value : 'NA';
     itemCols[item.col + '_rt']   = r ? (r.rt_ms || '') : '';
   });
@@ -1198,35 +1220,17 @@ function sendToSheets(correct, total, meanRt, dur, errLetters) {
     session_id: S.sessionId,
     modulo: MODULE_CODE,
     versao: MODULE_VERSION,
-    // Match Joana's column names
-    ID: S.id,
-    DN: S.dob,
-    IDD: S.am,
-    GEN: S.sex,
-    ESCOLA: S.sch,
-    PLNM: S.plnm ? 'Sim' : 'Não',
-    tecnico: S.ex,
-    data_sessao: S.dt,
-    formato: S.letterCase,
-    // Item-level (3B5–3B27 = 0/1, plus _resp and _rt)
+    ID: S.id, DN: S.dob, IDD: S.am, GEN: S.sex,
+    ESCOLA: S.sch, PLNM: S.plnm ? 'Sim' : 'Não',
+    tecnico: S.ex, data_sessao: S.dt, formato: S.letterCase,
     ...itemCols,
-    // Totals
     PIPALE3_IdentificacaoLetras: correct,
-    tr_medio_ms: meanRt,
-    duracao_s: S.el,
-    observacoes: S.nt
+    tr_medio_ms: meanRt, duracao_s: S.el, observacoes: S.nt
   };
 
-  fetch(SHEETS_URL, { method: 'POST', keepalive: true,
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload) })
-  .then(r => { ss.innerHTML = '<span class="sync-badge ok">✅ Guardado</span>'; })
-  .catch(err => {
-    console.error('Sheets error:', err);
-    // Fallback: try sendBeacon
-    try { navigator.sendBeacon(SHEETS_URL, new Blob([JSON.stringify(payload)], {type:'text/plain'})); } catch(e){}
-    ss.innerHTML = '<span class="sync-badge fail">❌ Falhou — use CSV</span>';
-  });
+  postToSheets(SHEETS_URL, payload)
+    .then(() => { ss.innerHTML = '<span class="sync-badge ok">✅ Enviado</span>'; })
+    .catch(() => { ss.innerHTML = '<span class="sync-badge fail">❌ Falhou — use CSV</span>'; });
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1409,17 +1413,15 @@ function testSheets() {
   const el = document.getElementById('sheets-status');
   el.innerHTML = '<span style="color:#b07d00;font-weight:600">⏳ A testar…</span>';
   const testPayload = { tipo: 'teste_ligacao', modulo: MODULE_CODE, timestamp: new Date().toISOString(), teste: true };
-  fetch(SHEETS_URL, { method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(testPayload) })
-  .then(() => {
-    el.innerHTML = '<span style="color:#2e8b57;font-weight:600">✅ Ligação OK</span><span style="font-size:.72rem;color:#888"> — verifica se apareceu uma linha de teste na Sheet</span>';
-    toast('✅ Teste enviado — verifica a Sheet');
-  })
-  .catch(() => {
-    el.innerHTML = '<span style="color:#c04040;font-weight:600">❌ Falhou</span><span style="font-size:.72rem;color:#999"> — verifica o URL e que o Apps Script está publicado</span>';
-    toast('❌ Teste falhou');
-  });
+  postToSheets(SHEETS_URL, testPayload)
+    .then(() => {
+      el.innerHTML = '<span style="color:#2e8b57;font-weight:600">✅ Enviado</span><span style="font-size:.72rem;color:#888"> — verifica se apareceu uma linha de teste na Sheet</span>';
+      toast('✅ Teste enviado — verifica a Sheet');
+    })
+    .catch(() => {
+      el.innerHTML = '<span style="color:#c04040;font-weight:600">❌ Falhou</span>';
+      toast('❌ Teste falhou');
+    });
 }
 
 /* ══════════════════════════════════════════════════════

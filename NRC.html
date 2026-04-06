@@ -228,17 +228,17 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 /* ══════════ REVIEW ══════════ */
 #sv { background:var(--bg); overflow-y:auto; }
 .rev-grid {
-  display:grid; grid-template-columns:repeat(5, 1fr); gap:4px;
-  max-width:480px; width:100%; margin:0 auto;
+  display:grid; grid-template-columns:repeat(10, 1fr); gap:8px 6px;
+  width:100%; margin:0 auto;
 }
 .rev-cell {
-  aspect-ratio:1; border-radius:10px; display:flex; align-items:center; justify-content:center;
-  border:3px solid rgba(0,0,0,.08); background:#fff; position:relative;
-  cursor:pointer; transition:all .12s; font-size:clamp(1.2rem, 3vw, 1.6rem);
+  aspect-ratio:1; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  border:2px solid rgba(0,0,0,.08); background:#fff; position:relative;
+  cursor:pointer; transition:all .12s; font-size:clamp(.8rem, 2vw, 1.1rem);
 }
 .rev-cell .rev-badge {
-  position:absolute; top:-4px; right:-4px; width:22px; height:22px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center; font-size:.65rem; font-weight:900;
+  position:absolute; top:-4px; right:-4px; width:18px; height:18px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:.5rem; font-weight:900;
   color:#fff; z-index:2; border:2px solid #fff;
 }
 .rev-cell[data-status="C"] .rev-badge { background:#2e8b57; }
@@ -338,10 +338,10 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 }
 
 /* Review word alignment */
-.rev-item { display:flex; flex-direction:column; gap:2px; }
+.rev-item { display:flex; flex-direction:column; gap:1px; }
 .rev-word {
-  font-size:.6rem; font-weight:700; text-align:center;
-  background:rgba(255,255,255,.85); border-radius:4px; padding:2px 3px;
+  font-size:.5rem; font-weight:700; text-align:center;
+  background:rgba(255,255,255,.85); border-radius:3px; padding:1px 2px;
   border:none; width:100%; color:#333; cursor:text;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   font-family:inherit;
@@ -349,18 +349,18 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 .rev-word:focus { outline:2px solid var(--rosa); background:#fff; }
 .rev-word.mismatch { background:#fff0f0; color:#c0392b; }
 .rev-ctrl-row {
-  display:flex; gap:2px; justify-content:center;
+  display:flex; gap:1px; justify-content:center;
 }
 .rev-ctrl-row button {
-  font-size:.55rem; padding:1px 4px; border-radius:4px; border:none; cursor:pointer;
-  font-weight:900; line-height:1.4; font-family:inherit;
+  font-size:.45rem; padding:1px 3px; border-radius:3px; border:none; cursor:pointer;
+  font-weight:900; line-height:1.3; font-family:inherit;
 }
 .btn-ins { background:#e0f0ea; color:#2e8b57; }
 .btn-del { background:#fff0e0; color:#e67e22; }
 .btn-skip-line {
-  grid-column:1/-1; font-size:.6rem; padding:3px 8px;
+  grid-column:1/-1; font-size:.6rem; padding:4px 10px;
   background:#f0e8ff; color:#7c6dd8; border:none; border-radius:6px;
-  cursor:pointer; font-weight:800; font-family:inherit; margin-top:2px;
+  cursor:pointer; font-weight:800; font-family:inherit; margin:4px 0;
 }
 </style>
 </head>
@@ -571,8 +571,8 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
     <button class="bk" onclick="skipReview()">←</button>
     <div><h2>Revisão</h2><p id="sv-subtitle">Correção da terapeuta</p></div>
   </div>
-  <div style="flex:1;overflow-y:auto;padding:20px 24px">
-    <div style="max-width:660px;margin:0 auto">
+  <div style="flex:1;overflow-y:auto;padding:16px 12px">
+    <div style="max-width:900px;margin:0 auto">
       <div id="rev-section-cores" style="display:none">
         <div style="font-size:.9rem;font-weight:800;color:var(--dark);margin-bottom:8px">🎨 NRC_CORES</div>
         <div class="rev-audio" id="rev-audio-cores"></div>
@@ -684,7 +684,7 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 /* ══════════════════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════════════════ */
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby8hFjd5pEgJDnEcpLjjKjRIWV04ONVM9xk7DGwhDBCllmJF28M3HSYu_GU5qFMpBgp/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzUWK1kQWYERtz7Zx0NxrwjrgNOuZhp5Zz12PIJki--hTwprNI1R0mU5hXeqU8aoQAv/exec';
 const MODULE_CODE = 'NRC';
 const MODULE_VERSION = '1.0';
 const GRID_COLS = 10;
@@ -1202,12 +1202,11 @@ function deleteWord(which, pos) {
 }
 
 function insertLineSkip(which, pos) {
-  const COLS = 5;
   const run = S.runs[which];
-  const blanks = Array(COLS).fill('');
+  const blanks = Array(GRID_COLS).fill('');
   run.words.splice(pos, 0, ...blanks);
   // Don't cut run.words — keeps overflow accessible
-  run.status.splice(pos, 0, ...Array(COLS).fill('O'));
+  run.status.splice(pos, 0, ...Array(GRID_COLS).fill('O'));
   run.status = run.status.slice(0, 50);
   buildRevGrid(which);
 }
@@ -1270,14 +1269,14 @@ function buildRevGrid(which) {
   const gridEl = document.getElementById('rev-grid-' + which);
   gridEl.innerHTML = '';
 
-  const COLS = 5; // review grid is always 5 cols for readability
+  const COLS = GRID_COLS; // 10 cols — same layout as the test grid
 
   run.sequence.forEach((itemId, i) => {
-    // Row separator with "skip line" button every COLS items
+    // Row separator with "skip line" button every COLS items (= every row)
     if (i > 0 && i % COLS === 0) {
       const skipBtn = document.createElement('button');
       skipBtn.className = 'btn-skip-line';
-      skipBtn.textContent = '⊕ Inserir linha de omissões aqui (×' + COLS + ')';
+      skipBtn.textContent = '⊕ Saltar linha (inserir ' + COLS + ' omissões)';
       skipBtn.onclick = () => insertLineSkip(which, i);
       gridEl.appendChild(skipBtn);
     }
@@ -1493,16 +1492,38 @@ function showResults() {
 }
 
 /* ══════════════════════════════════════════════════════
-   GOOGLE SHEETS
+   GOOGLE SHEETS — post via hidden form+iframe (no CORS issues)
 ══════════════════════════════════════════════════════ */
+function postToSheets(url, data) {
+  return new Promise((resolve, reject) => {
+    try {
+      const id = 'sf_' + Date.now();
+      const iframe = document.createElement('iframe');
+      iframe.name = id; iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      const form = document.createElement('form');
+      form.method = 'POST'; form.action = url; form.target = id;
+      const inp = document.createElement('textarea');
+      inp.name = 'payload'; inp.value = JSON.stringify(data);
+      form.appendChild(inp);
+      document.body.appendChild(form);
+
+      iframe.onload = () => { resolve(); setTimeout(() => { iframe.remove(); form.remove(); }, 500); };
+      iframe.onerror = () => { reject(); iframe.remove(); form.remove(); };
+      form.submit();
+      console.log('postToSheets submitted:', data);
+      setTimeout(() => { resolve(); try { iframe.remove(); form.remove(); } catch(e){} }, 4000);
+    } catch(e) { console.error('postToSheets error:', e); reject(e); }
+  });
+}
+
 function sendToSheets() {
   if (!SHEETS_URL) return;
   const ss = document.getElementById('sync-status');
   ss.innerHTML = '<span class="sync-badge wait">⏳ A guardar…</span>';
 
-  // Send one row per subtask
   const payloads = [];
-
   ['cores', 'animais'].forEach(which => {
     const run = S.runs[which];
     if (!run) return;
@@ -1518,14 +1539,9 @@ function sendToSheets() {
       modulo: MODULE_CODE,
       versao: MODULE_VERSION,
       subtarefa: which === 'cores' ? 'NRC_CORES' : 'NRC_ANIMAIS',
-      ID: S.id,
-      DN: S.dob,
-      IDD: S.am,
-      GEN: S.sex,
-      ESCOLA: S.sch,
-      PLNM: S.plnm ? 'Sim' : 'Não',
-      tecnico: S.ex,
-      data_sessao: S.dt,
+      ID: S.id, DN: S.dob, IDD: S.am, GEN: S.sex,
+      ESCOLA: S.sch, PLNM: S.plnm ? 'Sim' : 'Não',
+      tecnico: S.ex, data_sessao: S.dt,
       NRC_sequencia: JSON.stringify(run.sequence),
       NRC_tempo_s: +(run.timeMs / 1000).toFixed(1),
       NRC_erros: run.status.filter(s => s === 'E').length,
@@ -1541,18 +1557,9 @@ function sendToSheets() {
 
   let sent = 0;
   payloads.forEach(payload => {
-    fetch(SHEETS_URL, { method:'POST', keepalive: true,
-      headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify(payload) })
-    .then(r => {
-      sent++;
-      if (sent === payloads.length) ss.innerHTML = '<span class="sync-badge ok">✅ Guardado</span>';
-    })
-    .catch(err => {
-      console.error('Sheets error:', err);
-      try { navigator.sendBeacon(SHEETS_URL, new Blob([JSON.stringify(payload)], {type:'text/plain'})); } catch(e){}
-      ss.innerHTML = '<span class="sync-badge fail">❌ Falhou — use CSV</span>';
-    });
+    postToSheets(SHEETS_URL, payload)
+      .then(() => { sent++; if (sent === payloads.length) ss.innerHTML = '<span class="sync-badge ok">✅ Enviado</span>'; })
+      .catch(() => { ss.innerHTML = '<span class="sync-badge fail">❌ Falhou — use CSV</span>'; });
   });
 }
 
@@ -1734,17 +1741,16 @@ function testSheets() {
   if (!SHEETS_URL) { toast('⚠ Sem URL configurado'); return; }
   const el = document.getElementById('sheets-status');
   el.innerHTML = '<span style="color:#b07d00;font-weight:600">⏳ A testar…</span>';
-  fetch(SHEETS_URL, { method:'POST',
-    headers:{'Content-Type':'text/plain'},
-    body: JSON.stringify({ tipo:'teste_ligacao', modulo:MODULE_CODE, timestamp:new Date().toISOString(), teste:true }) })
-  .then(() => {
-    el.innerHTML = '<span style="color:#2e8b57;font-weight:600">✅ Ligação OK</span><span style="font-size:.72rem;color:#888"> — verifica se apareceu uma linha de teste na Sheet</span>';
-    toast('✅ Teste enviado');
-  })
-  .catch(() => {
-    el.innerHTML = '<span style="color:#c04040;font-weight:600">❌ Falhou</span>';
-    toast('❌ Teste falhou');
-  });
+  const testPayload = { tipo:'teste_ligacao', modulo:MODULE_CODE, timestamp:new Date().toISOString(), teste:true };
+  postToSheets(SHEETS_URL, testPayload)
+    .then(() => {
+      el.innerHTML = '<span style="color:#2e8b57;font-weight:600">✅ Enviado</span><span style="font-size:.72rem;color:#888"> — verifica se apareceu uma linha de teste na Sheet</span>';
+      toast('✅ Teste enviado — verifica a Sheet');
+    })
+    .catch(() => {
+      el.innerHTML = '<span style="color:#c04040;font-weight:600">❌ Falhou</span>';
+      toast('❌ Teste falhou');
+    });
 }
 
 /* ══════════════════════════════════════════════════════
