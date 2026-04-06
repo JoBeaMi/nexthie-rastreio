@@ -160,9 +160,9 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden;
       <!-- Stepping stones: zigzag path from bottom-left to tree portal
            Image is 1536×1024. Stones follow an S-curve. -->
 
-      <!-- Stone 1: bottom-left, near bridge -->
+      <!-- Stone 1: near bridge, bottom-left -->
       <a href="LETRAS_ID.html" class="gn active" id="gn-0"
-         style="left:32%;top:86%;--glow:rgba(232,93,117,.35);--glow2:rgba(232,93,117,.12);--gc:#E85D75">
+         style="left:28%;top:85%;--glow:rgba(232,93,117,.35);--glow2:rgba(232,93,117,.12);--gc:#E85D75">
         <div class="gn-circle" style="background:linear-gradient(145deg,#FF8A9E,#E85D75)">
           <img src="assets/icon_letras.png" alt="Letras">
           <div class="badge">JOGAR!</div>
@@ -172,7 +172,7 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden;
 
       <!-- Stone 2: up-right -->
       <a href="NRC.html" class="gn locked" id="gn-1"
-         style="left:39%;top:76%;--glow:rgba(245,166,35,.35);--glow2:rgba(245,166,35,.12);--gc:#F5A623;text-decoration:none">
+         style="left:35%;top:76%;--glow:rgba(245,166,35,.35);--glow2:rgba(245,166,35,.12);--gc:#F5A623;text-decoration:none">
         <div class="gn-circle" style="background:linear-gradient(145deg,#FFC85A,#F5A623)">
           <img src="assets/icon_narrativa.png" alt="Nomeação">
           <div class="badge">JOGAR!</div>
@@ -180,8 +180,8 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden;
         <span class="gn-name">Nomeação</span>
       </a>
 
-      <!-- Stone 3: dips down-right -->
-      <div class="gn locked" id="gn-2" style="left:48%;top:80%">
+      <!-- Stone 3: dips down-right (zigzag) -->
+      <div class="gn locked" id="gn-2" style="left:43%;top:80%">
         <div class="gn-circle" style="background:linear-gradient(145deg,#A08AEE,#7C6DD8)">
           <img src="assets/icon_locker.png" alt="Bloqueado">
         </div>
@@ -189,7 +189,7 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden;
       </div>
 
       <!-- Stone 4: up-right -->
-      <div class="gn locked" id="gn-3" style="left:54%;top:70%">
+      <div class="gn locked" id="gn-3" style="left:50%;top:69%">
         <div class="gn-circle" style="background:linear-gradient(145deg,#6AABEF,#4A90D9)">
           <img src="assets/icon_locker.png" alt="Bloqueado">
         </div>
@@ -197,15 +197,15 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden;
       </div>
 
       <!-- Stone 5: continues up -->
-      <div class="gn locked" id="gn-4" style="left:59%;top:62%">
+      <div class="gn locked" id="gn-4" style="left:56%;top:60%">
         <div class="gn-circle" style="background:linear-gradient(145deg,#7DD87D,#5CB85C)">
           <img src="assets/icon_locker.png" alt="Bloqueado">
         </div>
         <span class="gn-name">Parecidos</span>
       </div>
 
-      <!-- Stone 6: near tree base -->
-      <div class="gn locked" id="gn-5" style="left:64%;top:52%">
+      <!-- Stone 6: base of tree -->
+      <div class="gn locked" id="gn-5" style="left:62%;top:51%">
         <div class="gn-circle" style="background:linear-gradient(145deg,#F080A8,#D4537E)">
           <img src="assets/icon_locker.png" alt="Bloqueado">
         </div>
@@ -213,7 +213,7 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden;
       </div>
 
       <!-- Stone 7: tree portal -->
-      <div class="gn locked" id="gn-6" style="left:69%;top:40%">
+      <div class="gn locked" id="gn-6" style="left:68%;top:37%">
         <div class="gn-circle" style="background:linear-gradient(145deg,#F0A050,#E67E22)">
           <img src="assets/icon_locker.png" alt="Bloqueado">
         </div>
@@ -250,12 +250,6 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden;
 </div>
 
 <script>
-// Icon map for done state (star replaces locker)
-const ICON_MAP = {
-  'gn-0': { active:'assets/icon_letras.png', done:'assets/icon_star.png' },
-  'gn-1': { active:'assets/icon_narrativa.png', done:'assets/icon_star.png' },
-};
-
 // Position mascot above active node
 function posMascot(){
   const active = document.querySelector('.gn.active');
@@ -310,22 +304,16 @@ if(speechSynthesis.onvoiceschanged!==undefined)speechSynthesis.onvoiceschanged=(
         el.classList.remove('active','locked');
         el.classList.add('done');
         el.querySelector('.badge')?.remove();
-        // Swap icon to star
-        const iconMap = ICON_MAP[act.id];
-        if (iconMap) {
-          const img = el.querySelector('.gn-circle img');
-          if (img) img.src = iconMap.done;
-        }
+        // Keep the activity icon, just dim it
         const circle = el.querySelector('.gn-circle');
         if (circle) circle.style.opacity = '0.55';
       } else if (prevDone) {
         el.classList.remove('locked');
         el.classList.add('active');
-        // Swap icon to active version
-        const iconMap = ICON_MAP[act.id];
-        if (iconMap) {
-          const img = el.querySelector('.gn-circle img');
-          if (img) img.src = iconMap.active;
+        // Swap locker icon to the real activity icon
+        const img = el.querySelector('.gn-circle img');
+        if (img && img.src.includes('locker')) {
+          // Future activities: will need icon map here when they have icons
         }
       }
     });
