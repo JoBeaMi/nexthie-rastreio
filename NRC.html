@@ -662,9 +662,11 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
 <div id="scd" class="scr">
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;
     background:linear-gradient(180deg,#FFF8F2 0%,#E0F7F4 60%,#C5F5EA 100%);text-align:center;gap:18px">
-    <div class="child-mascot" style="animation:mascot-bounce 1.5s ease-in-out infinite">
-      <img src="assets/mascot_super_happy.png" alt="Mascote" style="width:140px;height:auto;filter:drop-shadow(0 6px 18px rgba(0,160,144,.3))">
-    </div>
+    <video id="vid-done" playsinline webkit-playsinline loop
+      style="width:160px;height:160px;border-radius:50%;object-fit:cover;
+        box-shadow:0 6px 28px rgba(0,160,144,.25);background:#E0F7F4">
+      <source src="assets/nexthie_mascot_hello.mp4" type="video/mp4">
+    </video>
     <h1 style="font-size:1.8rem;font-weight:900;color:#2a1a2e">Muito bem!</h1>
     <p style="font-size:1rem;font-weight:700;color:#7a6e66;max-width:320px;line-height:1.5">
       Fizeste um ótimo trabalho!<br>Vamos voltar aos jogos.
@@ -1415,7 +1417,10 @@ function showResults() {
       localStorage.setItem('nexthie_done', JSON.stringify(done));
     } catch(e) {}
     go('scd');
-    setTimeout(() => window.location.href = 'index.html', 3000);
+    // Play celebration video with audio (user has been interacting = autoplay allowed)
+    const vd = document.getElementById('vid-done');
+    if (vd) { vd.muted = false; vd.play().catch(() => { vd.muted = true; vd.play().catch(()=>{}); }); }
+    setTimeout(() => window.location.href = 'index.html', 4000);
     return;
   }
 
