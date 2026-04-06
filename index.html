@@ -139,7 +139,12 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;overflow:hidden;
 <body>
 
 <div class="tap-ov" id="tap-ov" onclick="startWelcome()">
-  <img src="assets/mascot_wave.png" alt="Mascote">
+  <video id="vid-hello" playsinline webkit-playsinline loop muted
+    poster="assets/mascot_wave.png"
+    style="width:140px;height:140px;border-radius:50%;object-fit:cover;
+      box-shadow:0 6px 28px rgba(0,160,144,.25);background:#E0F7F4">
+    <source src="assets/nexthie_mascot_hello.mp4" type="video/mp4">
+  </video>
   <h2>Toca para começar!</h2>
   <p>Os teus jogos estão à espera</p>
 </div>
@@ -268,7 +273,14 @@ const W2='Toca num jogo para começares!';
 const BB=['Olá! Vamos jogar?','Estes são os teus jogos!','Jogos novos vão aparecendo!','Diverte-te!','Toca num jogo para começares!'];
 function gv(){const v=speechSynthesis.getVoices(),p=v.filter(x=>x.lang==='pt-PT'),a=v.filter(x=>x.lang.startsWith('pt'));return p.find(x=>/femin|female|joana|ines|raquel/i.test(x.name))||p[0]||a[0]||null}
 
-function startWelcome(){const o=document.getElementById('tap-ov');o.style.opacity='0';setTimeout(()=>o.style.display='none',500);playWelcome()}
+function startWelcome(){
+  // Play video with audio on user tap (gesture unlocks autoplay)
+  const vh=document.getElementById('vid-hello');
+  if(vh){vh.muted=false;vh.play().catch(()=>{vh.muted=true;vh.play().catch(()=>{})});}
+  const o=document.getElementById('tap-ov');
+  o.style.opacity='0';setTimeout(()=>o.style.display='none',500);
+  playWelcome();
+}
 
 function playWelcome(){
   const w=document.getElementById('world'),sp=document.getElementById('speech');

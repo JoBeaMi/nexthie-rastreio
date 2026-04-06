@@ -667,20 +667,25 @@ input:not([type=radio]):not([type=checkbox]):focus, select:focus { outline:none;
     background:linear-gradient(180deg,#FFF8F2 0%,#E0F7F4 60%,#C5F5EA 100%);text-align:center;gap:18px">
     <video id="vid-done" playsinline webkit-playsinline loop
       poster="assets/mascot_super_happy.png"
-      style="width:160px;height:160px;border-radius:50%;object-fit:cover;
+      style="width:150px;height:150px;border-radius:50%;object-fit:cover;
         box-shadow:0 6px 28px rgba(0,160,144,.25);background:#E0F7F4">
       <source src="assets/nexthie_mascot_wave.mp4" type="video/mp4">
     </video>
     <h1 style="font-size:1.8rem;font-weight:900;color:#2a1a2e">Muito bem!</h1>
+    <img src="assets/icon_star.png" class="done-star" alt="Estrela"
+      style="width:100px;height:100px;object-fit:contain;
+        animation:star-pop .6s cubic-bezier(.34,1.56,.64,1) forwards, star-glow 1.5s ease-in-out .6s infinite;
+        filter:drop-shadow(0 0 20px rgba(255,215,0,.6))">
     <p style="font-size:1rem;font-weight:700;color:#7a6e66;max-width:320px;line-height:1.5">
-      Fizeste um ótimo trabalho!<br>Vamos voltar aos jogos.
+      Fizeste um ótimo trabalho!
     </p>
-    <div style="margin-top:8px;width:60px;height:60px;border:4px solid #00D4B8;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>
   </div>
 </div>
 <style>
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes mascot-bounce{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+@keyframes star-pop{0%{transform:scale(0) rotate(-30deg);opacity:0}100%{transform:scale(1) rotate(0deg);opacity:1}}
+@keyframes star-glow{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(255,215,0,.6))}50%{transform:scale(1.15);filter:drop-shadow(0 0 35px rgba(255,215,0,.9))}}
 </style>
 
 <div class="toast" id="toast">—</div>
