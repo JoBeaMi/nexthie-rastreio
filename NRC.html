@@ -1533,6 +1533,21 @@ function sendToSheets() {
       itemCols[`NRC_P${String(i+1).padStart(2,'0')}`] = st;
     });
 
+    // Build per-word timestamps from ASR events
+    const wordTimestamps = [];
+    (run.asrEvents || []).forEach(ev => {
+      const words = ev.text.split(/\s+/).filter(w => w);
+      words.forEach(() => wordTimestamps.push(ev.t_ms));
+    });
+
+    const tsCols = {};
+    const wordCols = {};
+    for (let i = 0; i < ITEMS_PER_GRID; i++) {
+      const key = String(i+1).padStart(2,'0');
+      wordCols[`NRC_W${key}`] = (run.words && run.words[i]) || '';
+      tsCols[`NRC_T${key}_ms`] = wordTimestamps[i] !== undefined ? wordTimestamps[i] : '';
+    }
+
     payloads.push({
       timestamp: new Date().toISOString(),
       session_id: S.sessionId,
@@ -1548,9 +1563,9 @@ function sendToSheets() {
       NRC_autocorrecoes: run.status.filter(s => s === 'AC').length,
       NRC_omissoes: run.status.filter(s => s === 'O').length,
       NRC_asr_transcript: run.asrText || '',
-      NRC_asr_alinhado: run.words ? run.words.slice(0,50).join(' ') : '',
-      NRC_asr_events_json: JSON.stringify(run.asrEvents || []),
       ...itemCols,
+      ...wordCols,
+      ...tsCols,
       observacoes: S.nt
     });
   });
